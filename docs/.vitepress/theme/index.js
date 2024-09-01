@@ -16,10 +16,11 @@ import "vitepress-markdown-timeline/dist/theme/index.css";
 // 图片缩放
 import mediumZoom from 'medium-zoom'
 import {onMounted, watch, nextTick} from 'vue';
-import {useRoute} from 'vitepress';
 // 开启评论
 import giscusTalk from 'vitepress-plugin-comment-with-giscus';
 import {useData, useRoute} from 'vitepress';
+// BackToTop
+import BackToTop from './components/BackToTop.vue'
 
 import './style.css'
 import './index.css'
@@ -30,6 +31,8 @@ export default {
     Layout: () => {
         return h(DefaultTheme.Layout, null, {
             // https://vitepress.dev/guide/extending-default-theme#layout-slots
+            // 在布局底部插入 BackToTop 组件
+            'layout-bottom': () => h(BackToTop)
         })
     },
     enhanceApp({app, router, siteData}) {
@@ -39,6 +42,7 @@ export default {
                 busuanzi.fetch();
             };
         }
+        app.component('BackToTop', BackToTop); // BackToTop
         app.component("Confetti", Confetti); //五彩纸屑注册全局组件
         app.component('update', update); //更新时间注册全局
         app.component('ArticleMetadata', ArticleMetadata); //字数统计

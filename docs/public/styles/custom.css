@@ -1,0 +1,15 @@
+/* 自定义返回顶部按钮样式 */
+.vp-back-to-top {
+    background-color: #007bff; /* 背景色 */
+    color: white; /* 文字颜色 */
+    border-radius: 50%; /* 圆形按钮 */
+    width: 40px; /* 按钮宽度 */
+    height: 40px; /* 按钮高度 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vp-back-to-top:hover {
+    background-color: #0056b3; /* 悬停时的背景色 */
+}

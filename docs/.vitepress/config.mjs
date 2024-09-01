@@ -21,7 +21,7 @@ export default defineConfig({
     // head
     head: [
         // 站点图标
-        ["link", {rel: "/icon", href: "/avatar.jpg"}],
+        ["link", {rel: "icon", href: "/icon/favicon.ico"}],
 
         // 谷歌字体
         [
@@ -119,19 +119,12 @@ export default defineConfig({
                 modifiedAt: ($page) => $page.lastUpdated && new Date($page.lastUpdated),
             },
         ],
-
-        // back-to-top
-        ['@vuepress/back-to-top', {
-            threshold: 100,
-            progress: true
-        }],
-
     ],
 
     // 主题
     themeConfig: {
         // logo
-        logo: "/icon/avater.jpg",
+        logo: "/icon/avatar.jpg",
 
         // 导航栏
         nav: navbar,
@@ -176,13 +169,13 @@ export default defineConfig({
 
         // 编辑
         editLink: {
-            pattern: 'https://github.com/vuejs/vitepress/edit/main/docs/:path',
+            pattern: 'https://github.com/gfzyl/york-blog/tree/master/docs',
             text: '完善页面'
         },
 
         // 友链
         socialLinks: [
-            {icon: 'github', link: 'https://github.com/vuejs/vitepress'}
+            {icon: 'github', link: 'https://github.com/gfzyl/york-blog/'},
         ],
 
         // 底部版权信息
