@@ -12,6 +12,8 @@ const vitepressSidebarOptions = {
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+    //网站部署的路径，默认根目录
+    base: '/',
     title: "York-经典鸡粉",
     description: "York的个人技术博客",
 
