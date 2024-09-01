@@ -1,9 +1,6 @@
 // https://vitepress.dev/guide/custom-theme
 import {h} from 'vue'
 import DefaultTheme from 'vitepress/theme'
-import {onMounted, watch, nextTick} from 'vue'
-import {useRoute} from 'vitepress'
-import mediumZoom from 'medium-zoom'
 // busuanzi插件
 import {inBrowser} from "vitepress";
 import busuanzi from "busuanzi.pure.js";
@@ -14,6 +11,12 @@ import Confetti from "./components/Confetti.vue";
 import update from "./components/update.vue"
 // 字数统计
 import ArticleMetadata from "./components/ArticleMetadata.vue";
+// 只需添加以下一行代码，引入时间线样式
+import "vitepress-markdown-timeline/dist/theme/index.css";
+// 图片缩放
+import mediumZoom from 'medium-zoom'
+import { onMounted, watch, nextTick } from 'vue';
+import { useRoute } from 'vitepress';
 
 
 import './style.css'

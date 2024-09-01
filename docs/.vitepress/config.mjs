@@ -1,7 +1,14 @@
 import {defineConfig} from 'vitepress'
-import sidebar from "./sidebar.mjs";
 import navbar from "./navbar.mjs";
 import {mediumZoomPlugin} from '@vuepress/plugin-medium-zoom'
+// 时间线
+import timeline from "vitepress-markdown-timeline";
+// 自动侧边栏
+import { generateSidebar } from 'vitepress-sidebar';
+
+const vitepressSidebarOptions = {
+    /* Options... */
+};
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -72,7 +79,9 @@ export default defineConfig({
                 let htmlResult = slf.renderToken(tokens, idx, options);
                 if (tokens[idx].tag === 'h1') htmlResult += `<ArticleMetadata />`;
                 return htmlResult;
-            }
+            };
+            // 时间线
+            md.use(timeline);
         }
     },
     // plugins
@@ -117,12 +126,6 @@ export default defineConfig({
             progress: true
         }],
 
-        // 图片缩放
-        ['@vuepress/medium-zoom',
-            {
-                selector: '.page :not(a) > img',
-            }
-        ],
     ],
 
     // 主题
@@ -137,26 +140,17 @@ export default defineConfig({
         returnToTopLabel: '返回顶部',
 
         // 侧边栏
-        sidebar: sidebar,
-        // sidebar: [
-        //     {
-        //         text: '文章表',
-        //         items: [
-        //             {text: 'Markdown Examples', link: '/markdown-examples'},
-        //             {text: 'Runtime API Examples', link: '/api-examples'}
-        //         ]
-        //     },
-        //     {
-        //         text: '后端篇',
-        //         items: [
-        //             {text: '心得', link: '/backend/心得'},
-        //             {text: 'Runtime API Examples', link: '/api-examples'}
-        //         ]
-        //     },
-        // ],
+        sidebar: generateSidebar({
+            documentRootPath: '/docs/', //文档根目录
+            collapsed: false, //折叠组关闭
+            collapseDepth: 2, //折叠组2级菜单
+            sortMenusByName: true,
+            removePrefixAfterOrdering: false, //删除前缀，必须与prefixSeparator一起使用
+            prefixSeparator: '.', //删除前缀的符号
+        }),
 
         // 更新时间
-        lastUpdatedText: "最近更新时间",
+        lastUpdatedText: "最近更新时间:",
 
         // 上下篇
         docFooter: {prev: '上一篇', next: '下一篇'},
