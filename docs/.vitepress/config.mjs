@@ -8,14 +8,7 @@ export default defineConfig({
     description: "York的个人技术博客",
 
     // 启用最近更新时间
-    // 是否使用 Git 获取每个页面的最后更新时间戳。时间戳将包含在每个页面的页面数据中，可通过 useData 访问。
-    lastUpdated: {
-        text: '最近更新时间:',
-        formatOptions: {
-            dateStyle: 'short',
-            timeStyle: 'short'
-        }
-    },
+    lastUpdated: true,
 
     // head
     head: [
@@ -61,7 +54,6 @@ export default defineConfig({
             `,
         ],
     ],
-
     // markdown
     markdown: {
         // 开启代码块的行号
@@ -74,7 +66,6 @@ export default defineConfig({
     plugins: [
         // 图片懒加载
         ["img-lazy"],
-
         // 代码复制
         [
             "vuepress-plugin-code-copy",
@@ -105,7 +96,6 @@ export default defineConfig({
                 modifiedAt: ($page) => $page.lastUpdated && new Date($page.lastUpdated),
             },
         ],
-
         // back-to-top
         ['@vuepress/back-to-top', {
             threshold: 100,
@@ -117,7 +107,7 @@ export default defineConfig({
     // 主题
     themeConfig: {
         // logo
-        logo: "/icon/avatar.jpg",
+        logo: "/icon/avater.jpg",
 
         // 导航栏
         nav: navbar,
@@ -144,11 +134,8 @@ export default defineConfig({
         // 更新时间
         lastUpdatedText: "最近更新时间",
 
-        // 页面底部信息
-        docFooter: {
-            prev: '上一篇',
-            next: '下一篇'
-        },
+        // 上下篇
+        docFooter: {prev: '上一篇', next: '下一篇'},
 
         outlineTitle: "目录",
         // 侧边栏显示二级标题到六级标题
@@ -166,12 +153,12 @@ export default defineConfig({
         pageInfo: ["Author", "Category", "Tag", "Original", "Word", "ReadingTime"],
 
         // GitHub 仓库位置
-        repo: "CodeNoob/york-blog",
-        docsBranch: "master",
+        repo: "gfzyl/york-blog",
+        docsBranch: "main",
 
         // 编辑
         editLink: {
-            pattern: 'https://gitee.com/CodeNoobPromising/blog',
+            pattern: 'https://github.com/vuejs/vitepress/edit/main/docs/:path',
             text: '完善页面'
         },
 
@@ -182,7 +169,6 @@ export default defineConfig({
 
         // 底部版权信息
         footer: {
-            message: 'Released under the MIT License.',
             copyright: "Copyright@ 2024 York"
         },
 
