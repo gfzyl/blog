@@ -61,4 +61,7 @@ lastUpdated: true
 
 ::: tip 学习愉快
 没啥好说的，感谢您的阅读！😄
+<DataPanel />
+<Confetti />
+<update />
 :::

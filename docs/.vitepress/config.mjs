@@ -1,6 +1,7 @@
 import {defineConfig} from 'vitepress'
 import sidebar from "./sidebar.mjs";
 import navbar from "./navbar.mjs";
+import {mediumZoomPlugin} from '@vuepress/plugin-medium-zoom'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -56,16 +57,29 @@ export default defineConfig({
     ],
     // markdown
     markdown: {
+        image: {
+            // 开启图片懒加载
+            lazyLoading: true
+        },
         // 开启代码块的行号
         lineNumbers: true,
         // 支持 4 级以上的标题渲染
         extractHeaders: ["h2", "h3", "h4", "h5", "h6"],
-    },
 
+        // 统计字数组件插入h1标题下
+        config: (md) => {
+            md.renderer.rules.heading_close = (tokens, idx, options, env, slf) => {
+                let htmlResult = slf.renderToken(tokens, idx, options);
+                if (tokens[idx].tag === 'h1') htmlResult += `<ArticleMetadata />`;
+                return htmlResult;
+            }
+        }
+    },
     // plugins
     plugins: [
         // 图片懒加载
         ["img-lazy"],
+
         // 代码复制
         [
             "vuepress-plugin-code-copy",
@@ -103,6 +117,12 @@ export default defineConfig({
             progress: true
         }],
 
+        // 图片缩放
+        ['@vuepress/medium-zoom',
+            {
+                selector: '.page :not(a) > img',
+            }
+        ],
     ],
 
     // 主题
@@ -112,6 +132,9 @@ export default defineConfig({
 
         // 导航栏
         nav: navbar,
+
+        //返回顶部文字修改
+        returnToTopLabel: '返回顶部',
 
         // 侧边栏
         sidebar: sidebar,
