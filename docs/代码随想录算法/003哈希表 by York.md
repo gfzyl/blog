@@ -1,0 +1,1016 @@
+# 哈希表专题
+
+## 哈希表理论基础
+
+### 哈希表
+
+首先什么是 哈希表，哈希表（英文名字为Hash table，国内也有一些算法书籍翻译为散列表，大家看到这两个名称知道都是指hash table就可以了）。
+
+> 哈希表是根据关键码的值而直接进行访问的数据结构。
+
+其实直白来讲其实数组就是一张哈希表。哈希表中**关键码**就是数组的**索引下标**，然后<u>通过下标直接访问数组中的元素</u>，如下图所示：
+
+![哈希表1](https://code-thinking-1253855093.file.myqcloud.com/pics/20210104234805168.png)
+
+那么哈希表能解决什么问题呢，**一般哈希表都是用来<u>快速判断一个元素是否出现集合里</u>。**
+
+例如要查询一个名字是否在这所学校里。要枚举的话时间复杂度是O(n)，但如果使用哈希表的话， 只需要O(1)就可以做到。我们只需要初始化把这所学校里学生的名字都存在哈希表里，在查询的时候通过索引直接就可以知道这位同学在不在这所学校里了。将学生姓名映射到哈希表上就涉及到了**hash function ，也就是哈希函数**
+
+### 哈希函数
+
+哈希函数如下图所示，通过**hashCode**把名字转化为数值，*一般hashcode是通过特定编码方式，可以将其他数据格式转化为不同的数值*，这样就把学生名字映射为哈希表上的索引数字了。
+
+![哈希表2](https://code-thinking-1253855093.file.myqcloud.com/pics/2021010423484818.png)
+
+如果hashCode得到的数值大于哈希表的大小（即tableSize）怎么办呢:question:
+
+此时为了保证映射出来的索引数值都落在哈希表上，我们会**再次对数值做一个取模**的操作，这样我们就保证了学生姓名一定可以映射到哈希表上了。
+
+此时问题又来了，哈希表就是一个数组。如果学生的数量大于哈希表的大小怎么办，此时就算哈希函数计算的再均匀，也避免不了会有几位学生的名字同时映射到哈希表的**同一个索引下标的位置**。
+
+### 哈希碰撞
+
+如图所示，小李和小王都映射到了索引下标 1 的位置，**这一现象叫做哈希碰撞**。
+
+![哈希表3](https://code-thinking-1253855093.file.myqcloud.com/pics/2021010423494884.png)
+
+一般哈希碰撞有两种解决方法， <u>拉链法和线性探测法</u>。
+
+#### 拉链法
+
+刚刚小李和小王在索引1的位置发生了冲突，**发生冲突的元素都被存储在链表中**。 这样我们就可以通过索引找到小李和小王了
+
+![哈希表4](https://code-thinking-1253855093.file.myqcloud.com/pics/20210104235015226.png)
+
+（数据规模是dataSize， 哈希表的大小为tableSize）。其实拉链法就是要选择适当的哈希表的大小，这样既不会因为数组空值而浪费大量内存，也不会因为链表太长而在查找上浪费太多时间。
+
+#### 线性探测法
+
+使用线性探测法，==一定要保证tableSize大于dataSize==。 我们需要依靠哈希表中的空位来解决碰撞问题。
+
+例如冲突的位置，放了小李，那么就向下找一个空位放置小王的信息。所以要求tableSize一定要大于dataSize ，要不然哈希表上就没有空置的位置来存放 冲突的数据了。如图所示：
+
+![哈希表5](https://code-thinking-1253855093.file.myqcloud.com/pics/20210104235109950.png)
+
+### 常见的三种哈希结构
+
+当我们想使用哈希法来解决问题的时候，我们一般会选择如下三种数据结构。
+
+- 数组
+- set （集合）
+- map(映射)
+
+总结一下，**当我们遇到了要快速判断一个元素是否出现集合里的时候，就要考虑哈希法**。
+
+但是哈希法也是**牺牲了空间换取了时间**，因为我们要使用额外的数组，set或者是map来存放数据，才能实现快速的查找。
+
+如果在做**==面试题目==**的时候遇到**需要判断一个元素是否出现过的场景也应该第一时间想到哈希法**！
+
+## 专题题目
+
+### 242.有效的字母异位词
+
+1. 题目
+
+   给定两个字符串 s 和 t ，编写一个函数来判断 t 是否是 s 的字母异位词。必须是出现的字母相同且每个字母出现次数相同。
+
+   示例 1: 输入: s = "anagram", t = "nagaram" 输出: true
+
+   示例 2: 输入: s = "rat", t = "car" 输出: false
+
+   **说明:** 你可以假设字符串只包含小写字母。   
+
+2. 思路
+
+   **数组其实就是一个简单哈希表**，而且这道题目中字符串只有小写字符，那么就可以定义一个数组，来记录字符串s里字符出现的次数。
+
+   如果对哈希表的理论基础关于数组，set，map不了解的话可以看这篇：[关于哈希表，你该了解这些！(opens new window)](https://programmercarl.com/哈希表理论基础.html)
+
+   需要定义一个多大的数组呢，定一个数组叫做record，大小为26 就可以了，初始化为0，因为字符a到字符z的ASCII也是26个连续的数值。
+
+   为了方便举例，判断一下字符串s= "aee", t = "eae"。
+
+   操作动画如下：
+
+   ![242.有效的字母异位词](https://code-thinking.cdn.bcebos.com/gifs/242.%E6%9C%89%E6%95%88%E7%9A%84%E5%AD%97%E6%AF%8D%E5%BC%82%E4%BD%8D%E8%AF%8D.gif)
+
+   定义一个数组叫做record用来上记录字符串s里字符出现的次数。
+
+   需要把字符映射到数组也就是哈希表的索引下标上，**因为字符a到字符z的ASCII是26个连续的数值，所以字符a映射为下标0，相应的字符z映射为下标25。**
+
+   再遍历 字符串s的时候，**只需要将 s[i] - ‘a’ 所在的元素做+1 操作即可，并不需要记住字符a的ASCII，只要求出一个相对数值就可以了。** 这样就将字符串s中字符出现的次数，统计出来了。
+
+   那看一下如何检查字符串t中是否出现了这些字符，同样在遍历字符串t的时候，对t中出现的字符映射哈希表索引上的数值再做-1的操作。
+
+   那么最后检查一下，**record数组如果有的元素不为零0，说明字符串s和t一定是谁多了字符或者谁少了字符，return false。**
+
+   最后如果record数组所有元素都为零0，说明字符串s和t是字母异位词，return true。
+
+   时间复杂度为O(n)，空间上因为定义是的一个常量大小的辅助数组，所以空间复杂度为O(1)。
+
+3. 我的代码 反倒被API搞得占用了很多空间，费事费力费空间
+
+   ```java
+   class Solution {
+       public boolean isAnagram(String s, String t) {
+           if (s.length() != t.length()) {
+               return false;
+           }
+           char[] scharArray = s.toCharArray();
+           Map<Character, Integer> characters = new HashMap<>();
+           for (char c : scharArray) {
+               int count = characters.containsKey(c) ? characters.get(c) + 1 : 1;
+               characters.put(c, count);
+           }
+           char[] tCharArray = t.toCharArray();
+           for (char c : tCharArray) {
+               if (!characters.containsKey(c)) {
+                   return false;
+               }
+               // c 包含在map中
+               characters.put(c, characters.get(c) - 1);
+           }
+           // 最后的map中所有value为0表示相同
+           Set<Map.Entry<Character, Integer>> entries = characters.entrySet();
+           for (Map.Entry<Character, Integer> entry : entries) {
+               if(entry.getValue() != 0){
+                   return false;
+               }
+           }
+           return true;
+       }
+   }
+   
+   ```
+
+4. 官方推荐
+
+   t 是 s 的异位词等价于「两个字符串中字符出现的种类和次数均相等」。由于字符串只包含26个小写字母，因此我们可以维护一个长度为26的频次数组table，先遍历记录字符串s中字符出现的频次，然后遍历字符串t，减去 table中对应的频次，如果出现table[i]<0，则说明t包含一个不在s中的额外字符，返回false即可。
+
+   ```java
+   class Solution {
+       public boolean isAnagram(String s, String t) {
+           if (s.length() != t.length()) {
+               return false;
+           }
+           int[] table = new int[26];
+           for (int i = 0; i < s.length(); i++) {
+               table[s.charAt(i) - 'a']++;
+           }
+           for (int i = 0; i < t.length(); i++) {
+               table[t.charAt(i) - 'a']--;
+               if (table[t.charAt(i) - 'a'] < 0) {
+                   return false;
+               }
+           }
+           return true;
+       }
+   }
+   
+   作者：力扣官方题解
+   链接：https://leetcode.cn/problems/valid-anagram/solutions/493231/you-xiao-de-zi-mu-yi-wei-ci-by-leetcode-solution/
+   来源：力扣（LeetCode）
+   著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+   ```
+
+   
+
+### 	349.两个数组的交集
+
+1. 题目
+
+   题意：给定两个数组，编写一个函数来计算它们的交集。
+
+   ![349. 两个数组的交集](https://code-thinking-1253855093.file.myqcloud.com/pics/20200818193523911.png)
+
+   **说明：** 输出结果中的每个元素一定是唯一的。 我们可以不考虑输出结果的顺序。    
+
+2. 思路
+
+   注意题目特意说明：**输出结果中的每个元素一定是唯一的，也就是说输出的结果的去重的， 同时可以不考虑输出结果的顺序**   
+
+   但是要注意，**使用数组来做哈希的题目，是因为题目都限制了数值的大小。**
+
+   **而且如果哈希值比较少、特别分散、跨度非常大，使用数组就造成空间的极大浪费。**
+
+3. 我的代码
+
+   ```java
+   class Solution {
+           public int[] intersection(int[] nums1, int[] nums2) {
+           Set<Integer> set = new HashSet<>();
+           Set<Integer> set2 = new HashSet<>();
+           for(int num : nums1){
+               if(!set.contains(num)){
+                   set.add(num);
+               }
+           }
+           // set2里放的就是最终的结果
+           for(int num : nums2){
+               if(set.contains(num) && !set2.contains(num)){
+                   set2.add(num);
+               }
+           }
+           int i = 0;
+           Object[] objects = set2.toArray();
+           int[] intersection = new int[objects.length];
+           for(int j=0; j< objects.length; j++){
+               intersection[j] = (Integer)objects[j];
+           }
+           return intersection;
+       }
+   }
+   ```
+
+4. 官方推荐
+
+   ```java
+   class Solution {
+       public int[] intersection(int[] nums1, int[] nums2) {
+           Set<Integer> set1 = new HashSet<Integer>();
+           Set<Integer> set2 = new HashSet<Integer>();
+           for (int num : nums1) {
+               set1.add(num);
+           }
+           for (int num : nums2) {
+               set2.add(num);
+           }
+           return getIntersection(set1, set2);
+       }
+   
+       public int[] getIntersection(Set<Integer> set1, Set<Integer> set2) {
+           if (set1.size() > set2.size()) {
+               return getIntersection(set2, set1);
+           }
+           Set<Integer> intersectionSet = new HashSet<Integer>();
+           for (int num : set1) {
+               if (set2.contains(num)) {
+                   intersectionSet.add(num);
+               }
+           }
+           int[] intersection = new int[intersectionSet.size()];
+           int index = 0;
+           for (int num : intersectionSet) {
+               intersection[index++] = num;
+           }
+           return intersection;
+       }
+   }
+   
+   作者：力扣官方题解
+   链接：https://leetcode.cn/problems/intersection-of-two-arrays/solutions/469445/liang-ge-shu-zu-de-jiao-ji-by-leetcode-solution/
+   来源：力扣（LeetCode）
+   著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+   ```
+
+
+
+### 202.快乐数
+
+1. 题目
+
+   编写一个算法来判断一个数 n 是不是快乐数。
+
+   「快乐数」定义为：对于一个正整数，每一次将该数替换为它每个位置上的数字的平方和，然后重复这个过程直到这个数变为 1，也可能是 无限循环 但始终变不到 1。如果 可以变为 1，那么这个数就是快乐数。
+
+   如果 n 是快乐数就返回 True ；不是，则返回 False 。
+
+   **示例：**
+
+   输入：19
+   输出：true
+   解释：
+   1^2 + 9^2 = 82
+   8^2 + 2^2 = 68
+   6^2 + 8^2 = 100
+   1^2 + 0^2 + 0^2 = 1    
+
+2. 思路
+
+   这道题目看上去貌似一道数学问题，其实并不是！
+
+   题目中说了会 **无限循环**，那么也就是说**求和的过程中，sum会重复出现，这对解题很重要！** **当我们遇到了要快速判断一个元素是否出现集合里的时候，就要考虑哈希法了。**
+
+   所以这道题目使用哈希法，来判断这个sum是否重复出现，如果重复了就是return false（代表会无限循环）， 否则一直找到sum为1为止。
+
+3. 我的代码
+
+   ```java
+   class Solution {
+       public boolean isHappy(int n) {
+           if(n == 1){
+               return true;
+           }
+           Set<Integer> result = new HashSet<>();
+           char[] charNum = String.valueOf(n).toCharArray();
+           int newNum = 0;
+           while(newNum != 1){
+               newNum = 0;
+               for(int i =0; i < charNum.length; i++){
+                   newNum += (charNum[i] - 48) * (charNum[i] - 48);
+               }
+               if(result.contains(newNum)){
+                   return false;
+               }
+               result.add(newNum);
+               charNum = String.valueOf(newNum).toCharArray();
+           }
+           return true;
+       }
+   }
+   ```
+
+   ```java
+   class Solution {
+       public boolean isHappy(int n) {
+           if(n == 1){
+               return true;
+           }
+           Set<Integer> result = new HashSet<>();
+           int newNum = 0;
+           while(newNum != 1){
+               newNum = calSum(newNum)
+               if(result.contains(newNum)){
+                   return false;
+               }
+               result.add(newNum);
+           }
+           return true;
+       }
+       
+       private int calSum(int n) {
+           int sum = 0;
+           while (n > 0) {
+               int bit = n % 10;
+               sum += bit * bit;
+               n /= 10;
+           }
+           return sum;
+       }
+   }
+   ```
+
+   
+
+4. 官方推荐
+
+   我的写法比较耗时，而且计算每一位也不用这样去算，确实有点费劲了
+
+   ```java
+   class Solution {
+       public boolean isHappy(int n) {
+           int slow = n;
+           int fast = n;
+           do {
+               slow = calSum(slow);
+               fast = calSum(fast);
+               fast = calSum(fast);
+           } while(slow != fast);
+   
+           return slow == 1;
+       }
+   
+       private int calSum(int n) {
+           int sum = 0;
+           while (n > 0) {
+               int bit = n % 10;
+               sum += bit * bit;
+               n /= 10;
+           }
+           return sum;
+       }
+   }
+   ```
+
+   
+
+### 	1.两数之和
+
+1. 题目
+
+   给定一个整数数组 nums 和一个目标值 target，请你在该数组中找出和为目标值的那 **两个** 整数，并返回他们的数组下标。
+
+   **你可以假设每种输入只会对应一个答案。但是，数组中同一个元素不能使用两遍。**你可以按任意顺序返回答案。
+
+   **示例:**
+
+   给定 nums = [2, 7, 11, 15], target = 9
+
+   因为 nums[0] + nums[1] = 2 + 7 = 9
+
+   所以返回 [0, 1]    
+
+2. 思路
+
+   强调一下 **什么时候使用哈希法**，当我们需要查询一个元素是否出现过，或者一个元素是否在集合里的时候，就要第一时间想到哈希法。
+
+   本题，我们不仅要知道元素有没有遍历过，还要知道这个元素对应的下标，**需要使用 key value结构来存放，key来存元素，value来存下标，那么使用map正合适**。所以 map中的存储结构为 {key：数据元素，value：数组元素对应的下标}。
+
+   再来看一下使用数组和set来做哈希法的局限。
+
+   - 数组的大小是受限制的，而且如果元素很少，而哈希值太大会造成内存空间的浪费。
+   - set是一个集合，里面放的元素只能是一个key，而两数之和这道题目，不仅要判断y是否存在而且还要记录y的下标位置，因为要返回x 和 y的下标。所以set 也不能用。
+
+   在遍历数组的时候，只需要向map去查询**是否有和目前遍历元素匹配的数值**(*<u>result=target-当前元素是否在map中</u>*)，如果有，就找到的匹配对，如果没有，就把目前遍历的元素放进map中，因为map存放的就是我们访问过的元素。
+
+   过程如下：
+
+   ![过程一](https://code-thinking-1253855093.file.myqcloud.com/pics/20220711202638.png)
+
+   ![过程二](https://code-thinking-1253855093.file.myqcloud.com/pics/20230220223536.png)   
+
+3. 我的代码
+
+   ```java
+   class Solution {
+       public int[] twoSum(int[] nums, int target) {
+           int[] result = new int[2];
+           Map<Integer, Integer> map = new HashMap<>();
+           for (int i = 0; i < nums.length; i++) {
+               if (!map.containsKey(target - nums[i])) {
+                   map.put(nums[i], i);
+               } else {
+                   // 有与当前值匹配的在map中
+                   result[0] = map.get(target - nums[i]);
+                   result[1] = i;
+               }
+           }
+           return result;
+       }
+   }
+   ```
+
+4. 官方推荐
+
+   ```java
+   class Solution {
+       public int[] twoSum(int[] nums, int target) {
+           if (nums == null || nums.length < 2) {
+               return new int[0];
+           }
+           Map<Integer, Integer> map = new HashMap<>();
+           for (int i = 0; i < nums.length; i++) {
+               int num = nums[i];
+               if (map.containsKey(target - num)) {
+                   return new int[]{map.get(target-num), i};
+               }
+               map.put(num, i);
+           }
+   
+           return new int[0];
+       }
+   }
+   ```
+   
+   算法是一样的，但是人家这种写法比我耗时较少
+
+### 	454.四数相加II【中等】
+
+1. 题目
+
+   给定四个包含整数的数组列表 A , B , C , D ,计算有多少个元组 (i, j, k, l) ，使得 A[i] + B[j] + C[k] + D[l] = 0。
+
+   为了使问题简单化，所有的 A, B, C, D 具有相同的长度 N，且 0 ≤ N ≤ 500 。所有整数的范围在 -2^28 到 2^28 - 1 之间，最终结果不会超过 2^31 - 1 。
+
+   **例如:**
+
+   输入:
+
+   - A = [ 1, 2]
+   - B = [-2,-1]
+   - C = [-1, 2]
+   - D = [ 0, 2]
+
+   输出:
+
+   2
+
+   **解释:**
+
+   两个元组如下:
+
+   1. (0, 0, 0, 1) -> A[0] + B[0] + C[0] + D[1] = 1 + (-2) + (-1) + 2 = 0
+   2. (1, 1, 0, 0) -> A[1] + B[1] + C[0] + D[0] = 2 + (-1) + (-1) + 0 = 0
+
+   ​    
+
+2. 思路
+
+   **这道题目是四个独立的数组，只要找到A[i] + B[j] + C[k] + D[l] = 0就可以，不用考虑有重复的四个元素相加等于0的情况**
+
+   所以还是拆分，将四个数字拆成两对，所以整体思路其实和上题的两数之和是一样的，只是现在的<u>**“两数”**</u>获取的途径是通过<u>一对数组遍历得到的结果</u>，接着同样的去找下一对与之匹配的    
+
+3. 我的代码
+
+   ```java
+   class Solution {
+       public int fourSumCount(int[] nums1, int[] nums2, int[] nums3, int[] nums4) {
+           Map<Integer, Integer> map = new HashMap<>();
+           for (int num1 : nums1) {
+               for (int num2 : nums2) {
+                   if (map.containsKey(num1 + num2)) {
+                       // 表示得到该结果总共有多少可能组合
+                       map.put(num1 + num2, map.get(num1 + num2) + 1);
+                   } else {
+                       map.put(num1 + num2, 1);
+                   }
+               }
+           }
+           // 继续遍历接下来两个数组，看看与目标值对应的时候存在
+           int count = 0;
+           for (int num3 : nums3) {
+               for (int num4 : nums4) {
+                   if (map.containsKey(0 - (num3 + num4))) {
+                       count += map.get(0 - (num3 + num4));
+                   }
+               }
+           }
+           return count;
+       }
+   }
+   ```
+
+4. 官方推荐
+
+   ```java
+   class Solution {
+       public int fourSumCount(int[] nums1, int[] nums2, int[] nums3, int[] nums4) {
+           int res = 0;
+           Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+           //统计两个数组中的元素之和，同时统计出现的次数，放入map
+           for (int i : nums1) {
+               for (int j : nums2) {
+                   int sum = i + j;
+                   map.put(sum, map.getOrDefault(sum, 0) + 1);
+               }
+           }
+           //统计剩余的两个元素的和，在map中找是否存在相加为0的情况，同时记录次数
+           for (int i : nums3) {
+               for (int j : nums4) {
+                   res += map.getOrDefault(0 - i - j, 0);
+               }
+           }
+           return res;
+       }
+   }
+   ```
+   
+   感觉很抽象。
+   
+   ```java
+   class Solution {
+       public int fourSumCount(int[] nums1, int[] nums2, int[] nums3, int[] nums4) {
+           int count = 0;
+           int[] mm1 = getMaxAndMin(nums1);
+           int[] mm2 = getMaxAndMin(nums2);
+           int[] mm3 = getMaxAndMin(nums3);
+           int[] mm4 = getMaxAndMin(nums4);
+   
+           int maxSum = Math.max(mm1[0] + mm2[0], -mm3[1] - mm4[1]);
+           int minSum = Math.min(mm1[1] + mm2[1], -mm3[0] - mm4[0]);
+   
+           int[] resArray = new int[maxSum - minSum + 1];
+           for (int n1 : nums1)
+               for (int n2 : nums2)
+                   resArray[n1 + n2 - minSum]++;
+           for (int n3 : nums3)
+               for (int n4 : nums4)
+                   count += resArray[-n3 - n4 - minSum];
+   
+           return count;
+       }
+   
+       public int[] getMaxAndMin(int[] nums) {
+           int max = Integer.MIN_VALUE;
+           int min = Integer.MAX_VALUE;
+           for (int n : nums) {
+               if (max < n)
+                   max = n;
+               if (min > n)
+                   min = n;
+           }
+           return new int[] { max, min };
+       }
+   }
+   ```
+   
+   
+
+### 	383.赎金信
+
+1. 题目
+
+   给定一个赎金信 (ransom) 字符串和一个杂志(magazine)字符串，判断第一个字符串 ransom 能不能由第二个字符串 magazines 里面的字符构成。如果可以构成，返回 true ；否则返回 false。
+
+   (==题目说明==：为了不暴露赎金信字迹，要从杂志上搜索各个需要的字母，组成单词来表达意思。<u>杂志字符串中的每个字符只能在赎金信字符串中使用一次</u>。)
+
+   **注意：**
+
+   你可以假设两个字符串均只含有小写字母。
+
+   canConstruct("a", "b") -> false
+   canConstruct("aa", "ab") -> false
+   canConstruct("aa", "aab") -> true    
+
+2. 思路
+
+   我的思路是把magazine中的字符记录在map中，map<String, Integer>，结构表示字符可以使用的次数
+
+   然后遍历ransomNode的字符，如果其中的字符不在map中就false,如果其中的字符多于map中记录的响应字符能够出现的次数也false 
+
+   本题判断第一个字符串ransom能不能由第二个字符串magazines里面的字符构成，但是这里需要注意两点。
+
+   - 第一点“为了不暴露赎金信字迹，要从杂志上搜索各个需要的字母，组成单词来表达意思” 这里*说明杂志里面的字母不可重复使用。*
+   - 第二点 “你可以假设两个字符串均只含有小写字母。” *说明只有小写字母*，这一点很重要
+
+   因为题目说只有小写字母，那可以采用空间换取时间的哈希策略，用一个长度为26的数组来记录magazine里字母出现的次数。
+
+   然后再用ransomNote去验证这个数组是否包含了ransomNote所需要的所有字母。
+
+   一些同学可能想，用数组干啥，都用map完事了，**其实在本题的情况下，使用map的空间消耗要比数组大一些的，因为map要维护红黑树或者哈希表，而且还要做哈希函数，是费时的！数据量大的话就能体现出来差别了。 所以数组更加简单直接有效！**
+
+3. 我的代码
+
+   ```java
+   class Solution {
+       public boolean canConstruct(String ransomNote, String magazine) {
+           if(ransomNote.length() == magazine.length() 
+               && ransomNote.length() == 1){
+                   // 只有一个字符的时候，两个必须一样
+               return ransomNote.equals(magazine);
+           }
+           Map<Character, Integer> map = new HashMap<>();
+           for(int i = 0; i < magazine.length(); i++){
+              if(map.containsKey(magazine.charAt(i))){
+                   map.put(magazine.charAt(i), 
+                           map.get(magazine.charAt(i)) + 1);
+               }else{
+                   map.put(magazine.charAt(i),1);
+               } 
+           }
+           // magazine中的字符全部在map中并记录了字符次数
+           for(int i = 0; i < ransomNote.length(); i++){
+               if(!map.containsKey(ransomNote.charAt(i))){
+                   return false;
+               }else{
+                   // 现在需要消耗一次map中记录的该字符，而次数不够
+                   if(map.get(ransomNote.charAt(i)) <= 0){
+                       return false;
+                   }
+                   map.put(ransomNote.charAt(i), 
+                           map.get(ransomNote.charAt(i)) -1);
+               }
+           }
+           return true;
+       }
+   }
+   ```
+
+4. 官方推荐
+
+   ```java
+   class Solution {
+       public boolean canConstruct(String ransomNote, String magazine) {
+           // shortcut
+           if (ransomNote.length() > magazine.length()) {
+               return false;
+           }
+           // 定义一个哈希映射数组
+           int[] record = new int[26];
+   
+           // 遍历
+           for(char c : magazine.toCharArray()){
+               record[c - 'a'] += 1;
+           }
+   
+           for(char c : ransomNote.toCharArray()){
+               record[c - 'a'] -= 1;
+           }
+           
+           // 如果数组中存在负数，说明ransomNote字符串总存在magazine中没有的字符
+           for(int i : record){
+               if(i < 0){
+                   return false;
+               }
+           }
+   
+           return true;
+       }
+   }
+   ```
+   
+   
+
+### 15.三数之和【中等】
+
+1. 题目
+
+   给你一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a，b，c ，使得 a + b + c = 0 ？请你找出所有满足条件且不重复的三元组。
+
+   **注意：** 答案中不可以包含重复的三元组。
+
+   示例：
+
+   给定数组 nums = [-1, 0, 1, 2, -1, -4]，
+
+   满足要求的三元组集合为： [ [-1, 0, 1], [-1, -1, 2] ]  
+
+2. 思路
+
+  **注意[0， 0， 0， 0] 这组数据**
+
+  #####  哈希解法
+
+  两层for循环就可以确定 a 和b 的数值了，可以使用哈希法来确定 0-(a+b) 是否在 数组里出现过，其实这个思路是正确的，但是我们有一个非常棘手的问题，就是题目中说的不可以包含重复的三元组。
+
+  把符合条件的三元组放进vector中，然后再去重，这样是非常费时的，很容易超时，也是这道题目通过率如此之低的根源所在。
+
+  去重的过程不好处理，有很多小细节，如果在面试中很难想到位。
+
+  时间复杂度可以做到O(n^2)，但还是比较费时的，因为不好做剪枝操作。
+
+  大家可以尝试使用哈希法写一写，**就知道其困难的程度了**。
+
+  
+
+  *事实证明确实是这样，，，太耗时耗力*
+
+  ##### 双指针
+
+  **其实这道题目使用哈希法并不十分合适**，因为在去重的操作中有很多细节需要注意，在面试中很难直接写出没有bug的代码。
+
+  而且使用哈希法 在使用两层for循环的时候，能做的剪枝操作很有限，虽然时间复杂度是O(n^2)，也是可以在leetcode上通过，但是程序的执行时间依然比较长 。
+
+  接下来介绍另一个解法：双指针法，**这道题目使用双指针法 要比哈希法高效一些**，那么来讲解一下具体实现的思路。
+
+  动画效果如下：
+
+  ![15.三数之和](https://code-thinking.cdn.bcebos.com/gifs/15.%E4%B8%89%E6%95%B0%E4%B9%8B%E5%92%8C.gif)
+
+  拿这个nums数组来举例，*首先将数组**排序***，然后有一层for循环，i从下标0的地方开始，同时定一个下标==left== 定义在i+1的位置上，定义下标==right== 在数组结尾的位置上。
+
+  依然还是在数组中找到 abc 使得a + b +c =0，我们这里相当于 a = nums[i]，b = nums[left]，c = nums[right]。
+
+  接下来如何移动left 和right呢， 如果nums[i] + nums[left] + nums[right] > 0 就说明 **此时三数之和大了**，因为数组是排序后了，所以**right下标就应该向左移动**，这样才能让三数之和小一些。
+
+  如果 nums[i] + nums[left] + nums[right] < 0 说明 **此时三数之和小了**，left 就向右移动，才能让三数之和大一些，直到left与right相遇为止。
+
+  时间复杂度：O(n^2)。
+
+3. 我的代码【放弃了哈希法】
+
+   我的思路是想着三个数中先求两个数的和，这两个数要求不能相同，将这两个数的和存放在map中作为key，而把这两个数作为value存放
+
+   接着这个数组中两个不同的数的求和 遍历结束，map中存放的就是
+
+   `sum:构成sum的集合`
+
+   然而，这样算有点麻烦，而且在遍历的时候我也不能很好的确定构成这个sum的两个数的集合，是否是重复的，即这两个数的重复问题有点难搞
+
+   
+
+   关于List的比较，看这篇https://blog.csdn.net/zhangshuzu/article/details/132899003
+
+   主要就是，如果两个list的元素完全相同且顺序完全相同，那么equals方法返回true，所以我们只需要排序然后equals
+
+   一定要灵活，为了避免重复，我们完全可以用Set
+
+   *`*return new ArrayList<>(result); 这一段代码的作用是将 Set<List<Integer>> 类型的 result 转换为 List<List<Integer>> 类型并返回。虽然 result 是一个 Set，但 new ArrayList<>(result) 这一语句会创建一个新的 ArrayList，并将 result 中的所有元素添加到这个新的 ArrayList 中。*`*
+
+   ```java
+   public List<List<Integer>> threeSum(int[] nums) {
+           Set<List<Integer>> result = new HashSet<>();
+           if (nums.length < 3) {
+               return new ArrayList<>(result);
+           }
+   
+           Arrays.sort(nums);
+           for (int i = 0; i < nums.length - 2; i++) {
+               if (i > 0 && nums[i] == nums[i - 1]) {
+                   continue;
+               }
+   
+               int left = i + 1;
+               int right = nums.length - 1;
+   
+               while (left < right) {
+                   int sum = nums[i] + nums[left] + nums[right];
+   
+                   if (sum == 0) {
+                       result.add(Arrays.asList(nums[i], nums[left], nums[right]));
+                       // 这个时候sum等于0，同时有可能left和left+1对应的值相同
+                       // 如果nums[left + 1] > nums[left]，因为已经排序了，（元素是整数）自然继续遍历下去不会有结果
+                       // 而nums[left + 1] == nums[left]的话，因为我们要的是不重复的，这个自然也不需要
+                       // 这个时候我们已经找到满足条件的left，就可以结束了
+                       break;
+                   } else if (sum < 0) {
+                       left++;
+                   } else {
+                       right--;
+                   }
+               }
+           }
+   
+           return new ArrayList<>(result);
+       }
+   ```
+
+4. 官方推荐
+   思路是一样的，但是人家的做法执行效率更高更快，去除了很多不必要的循环
+
+   ```java
+   class Solution {
+       public List<List<Integer>> threeSum(int[] nums) {
+       List<List<Integer>> listNest = new ArrayList<>();
+       if (nums.length < 3) {
+         // 直接返回空
+         return listNest;
+       }
+       Arrays.sort(nums);
+       for (int i = 0; i < nums.length - 2; i++) {
+         Integer num1 = nums[i];
+         if (num1 > 0) {
+           // 因为是有序的，当nums[1]为正数时，其他两个数不可能相加是负数
+           break;
+         }
+         if (i > 0 && nums[i] == nums[i - 1]) {
+           // 避免重复
+           continue;
+         }
+         Integer target = -num1;
+         // 两个指针分别知道i的后一位和列表的最后一位
+         int front = i + 1;
+         int end = nums.length - 1;
+   
+         while (front < end) {
+           int sumOfTwo = nums[front] + nums[end];
+           if (sumOfTwo == target) {
+             listNest.add(Arrays.asList(nums[i], nums[front], nums[end]));
+             front++;
+             end--;
+             // 这里需要做一个防重复的处理
+             while (front < end && nums[front] == nums[front - 1]) {
+               // 相同的数值，第一个指针从左到右前进一步
+               front++;
+             }
+             while (front < end && nums[end] == nums[end + 1]) {
+               // 相同的数值，第一个指针从右到左前进一步
+               end--;
+             }
+   
+           } else if (sumOfTwo > target) {
+             end--;
+           } else {
+             front++;
+           }
+         }
+       }
+       return listNest;
+       }
+   }
+   ```
+
+   
+
+### 	18.四数之和【中等】
+
+1. 题目
+
+   题意：给定一个包含 n 个整数的数组 nums 和一个目标值 target，判断 nums 中是否存在四个元素 a，b，c 和 d ，使得 a + b + c + d 的值与 target 相等？找出所有满足条件且不重复的四元组。
+
+   注意：
+
+   答案中不可以包含重复的四元组。
+
+   示例： 给定数组 nums = [1, 0, -1, 0, -2, 2]，和 target = 0。 满足要求的四元组集合为： [ [-1, 0, 0, 1], [-2, -1, 1, 2], [-2, 0, 0, 2] ]    
+
+2. 思路
+
+  四数之和，和[15.三数之和 (opens new window)](https://programmercarl.com/0015.三数之和.html)是一个思路，都是使用双指针法, 基本解法就是在[15.三数之和 (opens new window)](https://programmercarl.com/0015.三数之和.html)的基础上再套一层for循环。
+
+  但是有一些细节需要注意，例如： 不要判断`nums[k] > target` 就返回了，三数之和 可以通过 `nums[i] > 0` 就返回了，因为 0 已经是确定的数了，四数之和这道题目 target是任意值。比如：数组是`[-4, -3, -2, -1]`，`target`是`-10`，不能因为`-4 > -10`而跳过。但是我们依旧可以去做剪枝，逻辑变成`nums[i] > target && (nums[i] >=0 || target >= 0)`就可以了。
+
+  [15.三数之和 (opens new window)](https://programmercarl.com/0015.三数之和.html)的双指针解法是一层for循环num[i]为确定值，然后循环内有left和right下标作为双指针，找到nums[i] + nums[left] + nums[right] == 0。
+
+  四数之和的双指针解法是两层for循环nums[k] + nums[i]为确定值，依然是循环内有left和right下标作为双指针，找出nums[k] + nums[i] + nums[left] + nums[right] == target的情况，三数之和的时间复杂度是O(n^2)，四数之和的时间复杂度是O(n^3) 。
+
+  那么一样的道理，五数之和、六数之和等等都采用这种解法。
+
+  对于[15.三数之和 (opens new window)](https://programmercarl.com/0015.三数之和.html)双指针法就是将原本暴力O(n^3)的解法，降为O(n^2)的解法，四数之和的双指针解法就是将原本暴力O(n^4)的解法，降为O(n^3)的解法。
+
+  之前我们讲过哈希表的经典题目：[454.四数相加II (opens new window)](https://programmercarl.com/0454.四数相加II.html)，相对于本题简单很多，因为本题是要求在一个集合中找出四个数相加等于target，同时四元组不能重复。
+
+  而[454.四数相加II (opens new window)](https://programmercarl.com/0454.四数相加II.html)是四个独立的数组，只要找到A[i] + B[j] + C[k] + D[l] = 0就可以，不用考虑有重复的四个元素相加等于0的情况，所以相对于本题还是简单了不少    
+
+  **==现在理解更深刻==**
+
+  其实，我们的指针指向的就是三个数字，比如四元组**（a,b,c,d）,**思路就是用指针**k,i,left,right**分别指向的，
+
+  因此对**每个指针独自的去重意义就很明显了**
+
+3. 我的代码
+
+   ```java
+   
+   ```
+
+4. 官方推荐
+
+   ```java
+   class Solution {
+       public List<List<Integer>> fourSum(int[] nums, int target) {
+           List<List<Integer>> result = new ArrayList<>();
+           Arrays.sort(nums);
+           for (int i = 0; i < nums.length; i++) {
+   		
+               // nums[i] > target 直接返回, 剪枝操作
+               if (nums[i] > 0 && nums[i] > target) {
+                   return result;
+               }
+   		
+               if (i > 0 && nums[i - 1] == nums[i]) {    // 对nums[i]去重
+                   continue;
+               }
+               
+               for (int j = i + 1; j < nums.length; j++) {
+                   if (j > i + 1 && nums[j - 1] == nums[j]) {  
+                       // 对nums[j]去重，这个和nums[i]的去重逻辑是一样的
+                       // 体现了每个指针独立的指向
+                       continue;
+                   }
+                   int left = j + 1;
+                   int right = nums.length - 1;
+                   while (right > left) {
+   		    // nums[k] + nums[i] + nums[left] + nums[right] > target int会溢出
+                       long sum = (long) nums[i] + nums[j] + nums[left] + nums[right];
+                       if (sum > target) {
+                           right--;
+                       } else if (sum < target) {
+                           left++;
+                       } else {
+                           result.add(Arrays.asList(nums[i], nums[j], nums[left], nums[right]));
+                           // 对nums[left]和nums[right]去重
+                           while (right > left && nums[right] == nums[right - 1]) right--;
+                           while (right > left && nums[left] == nums[left + 1]) left++;
+   
+                           left++;
+                           right--;
+                       }
+                   }
+               }
+           }
+           return result;
+       }
+   }
+   ```
+   
+   
+
+## 哈希表总结
+
+**一般来说哈希表都是用来快速判断一个元素是否出现集合里**。
+
+对于哈希表，要知道**哈希函数**和**哈希碰撞**在哈希表中的作用。对于set,map等，**只有对这些数据结构的底层实现很熟悉，才能灵活使用，否则很容易写出效率低下的程序**。
+
+### 数组作为哈希表
+
+**有的题目用map，set确实可以，但使用map的空间消耗要比数组大一些，因为map要维护红黑树或者符号表，而且还要做哈希函数的运算。所以数组更加简单直接有效！**。
+
+###  set作为哈希表
+
+有些题目没有限制数值的大小，就无法使用数组来做哈希表了。
+
+**主要因为如下两点：**
+
+- 数组的大小是有限的，受到系统栈空间（不是数据结构的栈）的限制。
+- 如果数组空间够大，但哈希值比较少、特别分散、跨度非常大，使用数组就造成空间的极大浪费。
+
+所以此时一样的做映射的话，就可以使用set了。
+
+### map作为哈希表
+
+来说一说：使用数组和set来做哈希法的局限。
+
+- 数组的大小是受限制的，而且如果元素很少，而哈希值太大会造成内存空间的浪费。
+- set是一个集合，里面放的元素只能是一个key，而两数之和这道题目，不仅要判断y是否存在而且还要记录y的下标位置，因为要返回x 和 y的下标。所以set 也不能用。
+
+map是一种`<key, value>`的结构，本题可以用key保存数值，用value在保存数值所在的下标。所以使用map最为合适。
+
+在[454.四数相加 (opens new window)](https://programmercarl.com/0454.四数相加II.html)中我们提到了其实需要哈希的地方都能找到map的身影。
+
+本题咋眼一看好像和[18. 四数之和 (opens new window)](https://programmercarl.com/0018.四数之和.html)，[15.三数之和 (opens new window)](https://programmercarl.com/0015.三数之和.html)差不多，其实差很多！
+
+**关键差别是本题为四个独立的数组，只要找到A[i] + B[j] + C[k] + D[l] = 0就可以，不用考虑重复问题，而[18. 四数之和 (opens new window)](https://programmercarl.com/0018.四数之和.html)，[15.三数之和 (opens new window)](https://programmercarl.com/0015.三数之和.html)是一个数组（集合）里找到和为0的组合，可就难很多了！**
+
+用哈希法解决了两数之和，很多同学会感觉用哈希法也可以解决三数之和，四数之和。
+
+其实是可以解决，但是非常麻烦，需要去重导致代码效率很低。
+
+在[15.三数之和 (opens new window)](https://programmercarl.com/0015.三数之和.html)中我给出了哈希法和双指针两个解法，大家就可以体会到，使用哈希法还是比较麻烦的。
+
+所以18. 四数之和，15.三数之和都推荐使用双指针法！
+
+本篇我们从哈希表的理论基础到数组、set和map的经典应用，把哈希表的整个全貌完整的呈现给大家。
+
+**同时也强调虽然map是万能的，详细介绍了什么时候用数组，什么时候用set**。
+

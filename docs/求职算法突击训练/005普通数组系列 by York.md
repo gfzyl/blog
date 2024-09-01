@@ -1,0 +1,327 @@
+# LeetCode热题100
+
+## 普通数组系列
+
+### No1.[最大子数组和](https://leetcode.cn/problems/maximum-subarray/)
+
+给你一个整数数组 `nums` ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+
+**子数组**是数组中的一个连续部分。
+
+**示例 1：**
+
+```
+输入：nums = [-2,1,-3,4,-1,2,1,-5,4]
+输出：6
+解释：连续子数组 [4,-1,2,1] 的和最大，为 6 。
+```
+
+**示例 2：**
+
+```
+输入：nums = [1]
+输出：1
+```
+
+**示例 3：**
+
+```
+输入：nums = [5,4,-1,7,8]
+输出：23
+```
+
+> **思路及算法**
+>
+> 假设 nums 数组的长度是 n，下标从 0 到 n−1。
+>
+> 我们用 f(i) 代表以第 i 个数结尾的「连续子数组的最大和」，那么很显然我们要求的答案就是：
+>
+> max 0≤i≤n−1 {f(i)}
+>
+> 因此我们只需要求出每个位置的 f(i)，然后返回 f 数组中的最大值即可。那么我们如何求 f(i) 呢？我们可以考虑 nums[i] 单独成为一段还是加入 f(i−1) 对应的那一段，这取决于 nums[i] 和 f(i−1)+nums[i] 的大小，我们希望获得一个比较大的，于是可以写出这样的动态规划转移方程：
+>
+> f(i)=max{f(i−1)+nums[i],nums[i]}
+>
+> 不难给出一个时间复杂度 O(n)、空间复杂度 O(n) 的实现，即用一个 f 数组来保存 f(i) 的值，用一个循环求出所有 f(i)。考虑到 f(i) 只和 f(i−1) 相关，于是我们可以只用一个变量 pre 来维护对于当前 f(i) 的 f(i−1) 的值是多少，从而让空间复杂度降低到 O(1)，这有点类似「滚动数组」的思想。
+
+```java
+public class Solution {
+    public int maxSubArray(int[] nums) {
+        int len = nums.length;
+        // dp[i] 表示：以 nums[i] 结尾的连续子数组的最大和
+        int[] dp = new int[len];
+        dp[0] = nums[0];
+        int res = dp[0];
+        for (int i = 1; i < len; i++) {
+            if (dp[i - 1] > 0) {
+                dp[i] = dp[i - 1] + nums[i];
+            } else {
+                dp[i] = nums[i];
+            }
+            res = Math.max(res, dp[i]);
+        }
+        return res;
+    }
+}
+```
+
+### No2. [合并区间](https://leetcode.cn/problems/merge-intervals/)
+
+以数组 `intervals` 表示若干个区间的集合，其中单个区间为 `intervals[i] = [starti, endi]` 。请你合并所有重叠的区间，并返回 *一个不重叠的区间数组，该数组需恰好覆盖输入中的所有区间* 。
+
+**示例 1：**
+
+```
+输入：intervals = [[1,3],[2,6],[8,10],[15,18]]
+输出：[[1,6],[8,10],[15,18]]
+解释：区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].
+```
+
+**示例 2：**
+
+```
+输入：intervals = [[1,4],[4,5]]
+输出：[[1,5]]
+解释：区间 [1,4] 和 [4,5] 可被视为重叠区间。
+```
+
+> **思路及算法**
+>
+> 如果我们按照区间的左端点排序，那么在排完序的列表中，可以合并的区间一定是连续的。如下图所示，标记为蓝色、黄色和绿色的区间分别可以合并成一个大区间，它们在排完序的列表中是连续的：
+>
+> 我们用数组 merged 存储最终的答案。
+>
+> 首先，我们将列表中的区间按照左端点升序排序。然后我们将第一个区间加入 merged 数组中，并按顺序依次考虑之后的每个区间：
+>
+> 如果当前区间的左端点在数组 merged 中最后一个区间的右端点之后，那么它们不会重合，我们可以直接将这个区间加入数组 merged 的末尾；
+>
+> 否则，它们重合，我们需要用当前区间的右端点更新数组 merged 中最后一个区间的右端点，将其置为二者的较大值。
+>
+> 正确性证明
+>
+> 上述算法的正确性可以用反证法来证明：在排完序后的数组中，两个本应合并的区间没能被合并，那么说明存在这样的三元组 (i,j,k) 以及数组中的三个区间 a[i],a[j],a[k] 满足 i<j<k 并且 (a[i],a[k]) 可以合并，但 (a[i],a[j]) 和 (a[j],a[k]) 不能合并。这说明它们满足下面的不等式：
+>
+> a[i].end<a[j].start(a[i] 和 a[j] 不能合并)
+> a[j].end<a[k].start(a[j] 和 a[k] 不能合并)
+> a[i].end≥a[k].start(a[i] 和 a[k] 可以合并)
+> 我们联立这些不等式（注意还有一个显然的不等式 a[j].start≤a[j].end），可以得到：
+>
+> a[i].end<a[j].start≤a[j].end<a[k].start
+> 产生了矛盾！这说明假设是不成立的。因此，所有能够合并的区间都必然是连续的。
+
+````java
+class Solution {
+     public static int[][] merge(int[][] intervals) {
+        List<int[]> res = new LinkedList<>();
+        Arrays.sort(intervals,(a, b)-> a[0]-b[0]);
+        int left = intervals[0][0];
+        int right = intervals[0][1];
+
+        for (int i = 1; i < intervals.length; i++) {
+            if(intervals[i][0] <= right) {
+                right = Math.max(right, intervals[i][1]);
+            }else{
+                res.add(new int[]{left, right});
+                left = intervals[i][0];
+                right = intervals[i][1];
+            }
+            
+
+        }
+        res.add(new int[]{left, right});
+        return res.toArray(new int[res.size()][]);
+
+    }
+}
+````
+
+### No3. [轮转数组](https://leetcode.cn/problems/rotate-array/)
+
+给定一个整数数组 `nums`，将数组中的元素向右轮转 `k` 个位置，其中 `k` 是非负数。 
+
+**示例 1:**
+
+```
+输入: nums = [1,2,3,4,5,6,7], k = 3
+输出: [5,6,7,1,2,3,4]
+解释:
+向右轮转 1 步: [7,1,2,3,4,5,6]
+向右轮转 2 步: [6,7,1,2,3,4,5]
+向右轮转 3 步: [5,6,7,1,2,3,4]
+```
+
+**示例 2:**
+
+```
+输入：nums = [-1,-100,3,99], k = 2
+输出：[3,99,-1,-100]
+解释: 
+向右轮转 1 步: [99,-1,-100,3]
+向右轮转 2 步: [3,99,-1,-100]
+```
+
+> **思路及算法**
+>
+> 数组翻转
+> 该方法基于如下的事实：当我们将数组的元素向右移动 k 次后，尾部 kmodn 个元素会移动至数组头部，其余元素向后移动 kmodn 个位置。
+>
+> 该方法为数组的翻转：我们可以先将所有元素翻转，这样尾部的 kmodn 个元素就被移至数组头部，然后我们再翻转 [0,kmodn−1] 区间的元素和 [kmodn,n−1] 区间的元素即能得到最后的答案。
+>
+> 我们以 n=7，k=3 为例进行如下展示：
+>
+> |            操作             |     结果      |
+> | :-------------------------: | :-----------: |
+> |          原始数组           | 1 2 3 4 5 6 7 |
+> |        翻转所有元素         | 7 6 5 4 3 2 1 |
+> | 翻转 [0,kmodn−1] 区间的元素 | 5 6 7 4 3 2 1 |
+> | 翻转 [kmodn,n−1] 区间的元素 | 5 6 7 1 2 3 4 |
+
+```java
+class Solution {
+    public void rotate(int[] nums, int k) {
+        k %= nums.length; // 得转换成轮转的数组下标所在
+        reverse(nums, 0, nums.length - 1); // 整体反转
+        reverse(nums, 0, k - 1); // 前k个反转
+        reverse(nums, k, nums.length - 1); // 剩下的反转
+    }
+
+    public void reverse(int[] nums, int left, int right) {
+        // 先整体反转
+        while (left < right) {
+            int temp = nums[left];
+            nums[left] = nums[right];
+            nums[right] = temp;
+            left++;
+            right--;
+        }
+    }
+}
+```
+
+### No4. [除自身以外数组的乘积](https://leetcode.cn/problems/product-of-array-except-self/)
+
+给你一个整数数组 `nums`，返回 数组 `answer` ，其中 `answer[i]` 等于 `nums` 中除 `nums[i]` 之外其余各元素的乘积 。
+
+题目数据 **保证** 数组 `nums`之中任意元素的全部前缀元素和后缀的乘积都在 **32 位** 整数范围内。
+
+请 **不要使用除法，**且在 `O(n)` 时间复杂度内完成此题。 
+
+**示例 1:**
+
+```
+输入: nums = [1,2,3,4]
+输出: [24,12,8,6]
+```
+
+**示例 2:**
+
+```
+输入: nums = [-1,1,0,-3,3]
+输出: [0,0,9,0,0]
+```
+
+> **思路及算法**
+>
+> 左右乘积列表
+>
+> 我们不必将所有数字的乘积除以给定索引处的数字得到相应的答案，而是利用索引左侧所有数字的乘积和右侧所有数字的乘积（即前缀与后缀）相乘得到答案。
+>
+> 对于给定索引 i，我们将使用它左边所有数字的乘积乘以右边所有数字的乘积。下面让我们更加具体的描述这个算法。
+>
+> 
+>
+> 初始化两个空数组 L 和 R。对于给定索引 i，L[i] 代表的是 i 左侧所有数字的乘积，R[i] 代表的是 i 右侧所有数字的乘积。
+> 我们需要用两个循环来填充 L 和 R 数组的值。对于数组 L，L[0] 应该是 1，因为第一个元素的左边没有元素。对于其他元素：`L[i] = L[i-1] * nums[i-1]`。
+> 同理，对于数组 R，R[length-1] 应为 1。length 指的是输入数组的大小。其他元素：`R[i] = R[i+1] * nums[i+1]`。
+> 当 R 和 L 数组填充完成，我们只需要在输入数组上迭代，且索引 i 处的值为：L[i] * R[i]。
+
+```java
+class Solution {
+    public int[] productExceptSelf(int[] nums) {
+        // answer[i]其实等于它的前缀之积乘以后缀之积
+        // 不过对于开头和最后一个没有前缀或者后缀，所有元素都满足这样的条件
+        int[] answer = new int[nums.length];
+        int[] prefix = new int[nums.length]; // 前缀积
+        int[] suffix = new int[nums.length]; // 后缀积
+        prefix[0] = 1;
+        suffix[suffix.length - 1] = 1;
+        for (int i = 1, j = suffix.length - 2; i < nums.length && j >= 0; i++, j--) {
+            prefix[i] = nums[i - 1] * prefix[i - 1];
+            suffix[j] = nums[j + 1] * suffix[j + 1]; // 后缀积 = 下一个元素 * 下一个元素的后缀积
+        }
+        // 前后缀都算完了，现在算结果
+        for (int i = 0; i < answer.length; i++) {
+            answer[i] = prefix[i] * suffix[i];
+        }
+        return answer;
+    }
+}
+```
+
+### No5. [缺失的第一个正数](https://leetcode.cn/problems/first-missing-positive/)
+
+给你一个未排序的整数数组 `nums` ，请你找出其中没有出现的最小的正整数。
+
+请你实现时间复杂度为 `O(n)` 并且只使用常数级别额外空间的解决方案。
+
+ **示例 1：**
+
+```
+输入：nums = [1,2,0]
+输出：3
+解释：范围 [1,2] 中的数字都在数组中。
+```
+
+**示例 2：**
+
+```
+输入：nums = [3,4,-1,1]
+输出：2
+解释：1 在数组中，但 2 没有。
+```
+
+**示例 3：**
+
+```
+输入：nums = [7,8,9,11,12]
+输出：1
+解释：最小的正数 1 没有出现。
+```
+
+> **思路及算法**
+>
+> 非常巧妙
+>
+> 因为题目的要求其实就是可以用**输入的数组作为哈希表**，作法就是让`nums[i] 在 i + 1 这个下标上存放`，也就是 1在0上，2在1上
+>
+> 这样的话最后不在正确位置上的那个元素所占的位置`i`，就能和结果挂上关系，其实就是`i + 1`了;
+>
+> 如果位置都对，那就是`数组长度+1`
+
+```java
+class Solution {
+    public int firstMissingPositive(int[] nums) {
+        int len = nums.length;
+        for (int i = 0; i < len; i++) {
+            while (nums[i] > 0 && nums[i] <= len && nums[nums[i] - 1] != nums[i]) {
+                // 满足在指定范围内、并且没有放在正确的位置上，才交换
+                // 例如：数值 3 应该放在索引 2 的位置上
+                swap(nums, nums[i] - 1, i);
+            }
+        }
+        // [1, -1, 3, 4]
+        for (int i = 0; i < len; i++) {
+            if (nums[i] != i + 1) {
+                return i + 1;
+            }
+        }
+        // 都正确则返回数组长度 + 1
+        return len + 1;
+    }
+    public void swap(int[] nums, int left, int right){
+        int temp = nums[left];
+        nums[left] = nums[right];
+        nums[right] = temp;
+    }
+}
+```
