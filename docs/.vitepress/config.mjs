@@ -96,6 +96,7 @@ export default defineConfig({
                 modifiedAt: ($page) => $page.lastUpdated && new Date($page.lastUpdated),
             },
         ],
+
         // back-to-top
         ['@vuepress/back-to-top', {
             threshold: 100,
