@@ -15,9 +15,11 @@ import ArticleMetadata from "./components/ArticleMetadata.vue";
 import "vitepress-markdown-timeline/dist/theme/index.css";
 // 图片缩放
 import mediumZoom from 'medium-zoom'
-import { onMounted, watch, nextTick } from 'vue';
-import { useRoute } from 'vitepress';
-
+import {onMounted, watch, nextTick} from 'vue';
+import {useRoute} from 'vitepress';
+// 开启评论
+import giscusTalk from 'vitepress-plugin-comment-with-giscus';
+import {useData, useRoute} from 'vitepress';
 
 import './style.css'
 import './index.css'
@@ -38,12 +40,35 @@ export default {
             };
         }
         app.component("Confetti", Confetti); //五彩纸屑注册全局组件
-        app.component('update' , update); //更新时间注册全局
-        app.component('ArticleMetadata' , ArticleMetadata); //字数统计
+        app.component('update', update); //更新时间注册全局
+        app.component('ArticleMetadata', ArticleMetadata); //字数统计
         // ...
     },
     setup() {
-        const route = useRoute()
+        // Get frontmatter and route
+        const {frontmatter} = useData();
+        const route = useRoute();
+
+        // giscus配置(评论)
+        giscusTalk({
+                repo: 'gfzyl/york-blog', //仓库
+                repoId: 'R_kgDOMqoWgg', //仓库ID
+                category: 'Announcements', // 讨论分类
+                categoryId: 'DIC_kwDOMqoWgs4CiH3y', //讨论分类ID
+                mapping: 'pathname',
+                inputPosition: 'bottom',
+                lang: 'zh-CN',
+                theme: "preferred_color_scheme",
+                loading: "lazy"
+            },
+            {
+                frontmatter, route
+            },
+            //默认值为true，表示已启用，此参数可以忽略；
+            //如果为false，则表示未启用
+            //您可以使用“comment:true”序言在页面上单独启用它
+            true
+        );
 
         const initZoom = () => {
             // 初始化 MediumZoom 仅在每个路由切换时调用
