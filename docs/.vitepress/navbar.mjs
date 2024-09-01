@@ -9,11 +9,11 @@ export default [
     },
     {
         text: "求职算法突击训练",
-        link: '/guide/求职算法突击训练/001哈希系列 by York'
+        link: '/guide/求职算法突击训练/'
     },
     {
         text: "代码随想录题目",
-        link: '/guide/代码随想录算法/001数组 by York'
+        link: '/guide/代码随想录算法/'
     },
     {
         text: "项目打磨",

@@ -170,6 +170,7 @@ export default defineConfig({
 
         // 底部版权信息
         footer: {
+            message: 'Released under the MIT License.',
             copyright: "Copyright@ 2024 York"
         },
 

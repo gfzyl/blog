@@ -1,5 +1,5 @@
 export default [
-    "",
+    "/guide/Ape-frame脚手架项目/",
     {
         title: "APE-FRAME脚手架项目",
         collapsable: false,
