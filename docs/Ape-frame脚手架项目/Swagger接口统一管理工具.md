@@ -13,9 +13,9 @@ swagger不仅可以用来展示有什么接口，他可以测试，而且速度�
     <version>2.7.0</version>
 </dependency>
 <dependency>
-    <groupId>io.springfox</groupId>
-    <artifactId>springfox-swagger2</artifactId>
-    <version>2.7.0</version>
+<groupId>io.springfox</groupId>
+<artifactId>springfox-swagger2</artifactId>
+<version>2.7.0</version>
 </dependency>
 ```
 
@@ -64,9 +64,9 @@ public class SwaggerConfig {
 
 进入以后如图界面
 
-![](./../%E9%B8%A1%E7%BF%85Club%E9%A1%B9%E7%9B%AE/1%E4%B8%80%E6%9C%9F/%E7%9F%A5%E8%AF%86/swagger%E7%9A%84%E4%BD%BF%E7%94%A8.jpg)
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/swagger%E7%9A%84%E4%BD%BF%E7%94%A8.jpg)
 
-### 优化1
+## 优化1
 
 上述配置中我们将基本信息都写死了，这样搞很不友好，于是我们把基本信息抽取成为一个bean出来，让用户在yaml中自己配置，然后系统读取这些配置，即读取生成的bean的属性
 
@@ -180,7 +180,7 @@ swagger:
   description: 开箱即用的脚手架
 ```
 
-### 优化2
+## 优化2
 
 打开swagger以后看到的都是英文，缺少必要的中文解释，我们可以用注解
 
@@ -188,4 +188,4 @@ swagger:
 
 ==@ApiParam("姓名")== 在Po的属性字段上用这样的注解，就是对字段的描述，在swagger上会显示出来
 
-![](./../%E9%B8%A1%E7%BF%85Club%E9%A1%B9%E7%9B%AE/1%E4%B8%80%E6%9C%9F/%E7%9F%A5%E8%AF%86/swagger%E9%85%8D%E7%BD%AE%E4%BC%98%E5%8C%96.jpg)
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/swagger%E9%85%8D%E7%BD%AE%E4%BC%98%E5%8C%96.jpg)

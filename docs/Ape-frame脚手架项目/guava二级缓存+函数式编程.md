@@ -10,11 +10,11 @@
     <artifactId>guava</artifactId>
     <version>${guava.version}</version>
 </dependency>
-<!-- fastjson -->
+        <!-- fastjson -->
 <dependency>
-    <groupId>com.alibaba</groupId>
-    <artifactId>fastjson</artifactId>
-    <version>${fastjson.version}</version>
+<groupId>com.alibaba</groupId>
+<artifactId>fastjson</artifactId>
+<version>${fastjson.version}</version>
 </dependency>
 ```
 

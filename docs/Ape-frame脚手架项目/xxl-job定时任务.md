@@ -14,11 +14,11 @@
 
 首先打开==下载==好的项目，打开其中的db目录可以看到执行xxl-job的后台的sql，先把这个sql在数据库中运行起来
 
-![](./../%E6%AF%8F%E6%97%A5%E5%AE%8C%E6%88%90%E8%AE%A1%E5%88%92%E6%88%AA%E5%9B%BE/xxl-job/xxl-job%E4%BD%BF%E7%94%A8%E4%B9%8B%E5%89%8D%E7%9A%84%E6%95%B0%E6%8D%AE%E5%BA%93%E6%93%8D%E4%BD%9C.jpg)
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/xxl-job%E4%BD%BF%E7%94%A8%E4%B9%8B%E5%89%8D%E7%9A%84%E6%95%B0%E6%8D%AE%E5%BA%93%E6%93%8D%E4%BD%9C.jpg)
 
 然后再application.properties中配置刚刚设置的数据库
 
-![](./../%E6%AF%8F%E6%97%A5%E5%AE%8C%E6%88%90%E8%AE%A1%E5%88%92%E6%88%AA%E5%9B%BE/xxl-job/%E9%85%8D%E7%BD%AE%E6%95%B0%E6%8D%AE%E5%BA%93.jpg)
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E9%85%8D%E7%BD%AE%E6%95%B0%E6%8D%AE%E5%BA%93.jpg)
 
 调完这些以后就可以启动服务登录啦
 
@@ -26,9 +26,9 @@
 
 密码是123456
 
-![](./../%E6%AF%8F%E6%97%A5%E5%AE%8C%E6%88%90%E8%AE%A1%E5%88%92%E6%88%AA%E5%9B%BE/xxl-job/%E5%A6%82%E4%BD%95%E8%BF%9B%E5%85%A5XXLJOB%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E4%B8%AD%E5%BF%83.jpg)
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E5%A6%82%E4%BD%95%E8%BF%9B%E5%85%A5XXLJOB%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E4%B8%AD%E5%BF%83.jpg)
 
-![](./../%E6%AF%8F%E6%97%A5%E5%AE%8C%E6%88%90%E8%AE%A1%E5%88%92%E6%88%AA%E5%9B%BE/xxl-job/%E8%BF%9B%E5%85%A5%E4%BB%A5%E5%90%8E.jpg)
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E8%BF%9B%E5%85%A5%E4%BB%A5%E5%90%8E.jpg)
 
 ### 二、对自己的项目配置xxl-job
 
@@ -153,7 +153,7 @@ public class XxlJobConfig {
 
 上述配置就能读取字段，然后应该可以用自动注册的方式将自己的项目配置到xxl-job-admin上，如果没有的话也可以手动配置
 
-![](./../%E6%AF%8F%E6%97%A5%E5%AE%8C%E6%88%90%E8%AE%A1%E5%88%92%E6%88%AA%E5%9B%BE/xxl-job/%E6%89%8B%E5%8A%A8%E5%BD%95%E5%85%A5%E8%87%AA%E5%B7%B1%E7%9A%84%E9%A1%B9%E7%9B%AE.jpg)
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E6%89%8B%E5%8A%A8%E5%BD%95%E5%85%A5%E8%87%AA%E5%B7%B1%E7%9A%84%E9%A1%B9%E7%9B%AE.jpg)
 
 ### 三、启动相关
 
@@ -201,15 +201,15 @@ public class SampleXxlJob {
 
 ==@XxlJob("demoJobHandler")== 用这个注解的方式，将其中方法新增到任务管理中，可以看到我们JobHandler就是这个注解的值（方法名）
 
-![](./../%E6%AF%8F%E6%97%A5%E5%AE%8C%E6%88%90%E8%AE%A1%E5%88%92%E6%88%AA%E5%9B%BE/xxl-job/%E6%96%B0%E5%A2%9E%E4%BB%BB%E5%8A%A1.jpg)
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E6%96%B0%E5%A2%9E%E4%BB%BB%E5%8A%A1.jpg)
 
 接着对任务可以选择启动
 
-![](./../%E6%AF%8F%E6%97%A5%E5%AE%8C%E6%88%90%E8%AE%A1%E5%88%92%E6%88%AA%E5%9B%BE/xxl-job/%E5%AF%B9%E4%BB%BB%E5%8A%A1%E5%8F%AF%E4%BB%A5%E9%80%89%E6%8B%A9.jpg)
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E5%AF%B9%E4%BB%BB%E5%8A%A1%E5%8F%AF%E4%BB%A5%E9%80%89%E6%8B%A9.jpg)
 
 接着就可以选择执行，执行完以后可以看到日志
 
-![](./../%E6%AF%8F%E6%97%A5%E5%AE%8C%E6%88%90%E8%AE%A1%E5%88%92%E6%88%AA%E5%9B%BE/xxl-job/%E6%9F%A5%E7%9C%8B%E8%B0%83%E5%BA%A6%E6%97%A5%E5%BF%97.jpg)
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E6%9F%A5%E7%9C%8B%E8%B0%83%E5%BA%A6%E6%97%A5%E5%BF%97.jpg)
 
 ![](./../%E6%AF%8F%E6%97%A5%E5%AE%8C%E6%88%90%E8%AE%A1%E5%88%92%E6%88%AA%E5%9B%BE/xxl-job/%E8%BF%99%E9%87%8C%E5%8F%AF%E4%BB%A5%E7%9C%8B%E5%88%B0%E6%89%A7%E8%A1%8C%E6%97%A5%E5%BF%97.jpg)
 

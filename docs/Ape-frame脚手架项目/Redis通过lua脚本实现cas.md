@@ -160,16 +160,16 @@ public void testCompareAndSet() throws Exception {
 
 这里我们准备了一个测试环境，意图是看看key=luaCas对应的key，原来的值如果是2的话，就改成3，否则这次操作是失败的。
 
-![](./../%E6%AF%8F%E6%97%A5%E5%AE%8C%E6%88%90%E8%AE%A1%E5%88%92%E6%88%AA%E5%9B%BE/xxl-job/lua%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C%E5%89%8D.jpg)
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/lua%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C%E5%89%8D.jpg)
 
-![](./../%E6%AF%8F%E6%97%A5%E5%AE%8C%E6%88%90%E8%AE%A1%E5%88%92%E6%88%AA%E5%9B%BE/xxl-job/lua%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C%E5%90%8E.jpg)
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/lua%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C%E5%90%8E.jpg)
 
-![](./../%E6%AF%8F%E6%97%A5%E5%AE%8C%E6%88%90%E8%AE%A1%E5%88%92%E6%88%AA%E5%9B%BE/xxl-job/lua%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C%E5%90%8Eredis%E7%9A%84%E5%8F%98%E5%8C%96.jpg)
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/lua%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C%E5%90%8Eredis%E7%9A%84%E5%8F%98%E5%8C%96.jpg)
 
 可以看到我们的操作确实是成功的
 
 现在再次执行的话，执行会失败，原因是redis中当前存储的是3而不是2
 
-![](./../%E6%AF%8F%E6%97%A5%E5%AE%8C%E6%88%90%E8%AE%A1%E5%88%92%E6%88%AA%E5%9B%BE/xxl-job/lua%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C%E5%90%8E%EF%BC%88%E6%AD%A3%E5%B8%B8%EF%BC%89.jpg)
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/lua%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C%E5%90%8E%EF%BC%88%E6%AD%A3%E5%B8%B8%EF%BC%89.jpg)
 
 这样一来我们Redis用lua脚本的就实现啦

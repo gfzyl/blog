@@ -2,7 +2,7 @@
 
 首先安装启动Redis（需要配置文件，密码什么的可选设定，端口）
 
-### 未做Jackson序列化配置时引出的乱码问题
+## 未做Jackson序列化配置时引出的乱码问题
 
 当然了，自己用命令行的方式自己和自己不会出现乱码，因为用命令行的方式不存在一个序列化的问题，远程使用的时候才存在
 
@@ -12,7 +12,7 @@
 
 和https://www.jb51.net/program/291992e91.htm
 
-![](./../%E9%B8%A1%E7%BF%85Club%E9%A1%B9%E7%9B%AE/1%E4%B8%80%E6%9C%9F/%E7%9F%A5%E8%AF%86/Redis%E6%9C%AA%E5%81%9AJackson%E5%BA%8F%E5%88%97%E5%8C%96%E6%97%B6%E5%BC%95%E5%87%BA%E7%9A%84%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98.jpg)
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com/APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/Redis%E6%9C%AA%E5%81%9AJackson%E5%BA%8F%E5%88%97%E5%8C%96%E6%97%B6%E5%BC%95%E5%87%BA%E7%9A%84%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98.jpg)
 
 总的来说，==key==或者==hashKey==本来就是字符串，用String的序列化器即可，而==value==或者==hashValue==的话很多是对象，需要用到==JSON== 序列化方式，之所以乱码是因为原生JDK的序列化方式弄出来的结果是如上图一样的人类不可读的东西，所以为了可读性我们要配置一下序列化方式
 
@@ -78,9 +78,9 @@ public class RedisConfig {
 
 做如上配置即可
 
-![](./../%E9%B8%A1%E7%BF%85Club%E9%A1%B9%E7%9B%AE/1%E4%B8%80%E6%9C%9F/%E7%9F%A5%E8%AF%86/redis%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3.jpg)
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/redis%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3.jpg)
 
-### 封装RedisUtil
+## 封装RedisUtil
 
 将RedisTemplate对Redis的操作封装成RedisUtil，在这里可以根据自己情况对其他的操作进行封装
 
@@ -109,7 +109,7 @@ public class RedisUtil {
 }
 ```
 
-### 缓存预热
+## 缓存预热
 
 很多时候我们需要在服务启动的时候，在缓存中先预热一些数据，这就是缓存预热
 
@@ -328,15 +328,15 @@ init:
 
 
 
-### 分布式锁
+## 分布式锁
 
-#### 使用场景
+### 使用场景
 
 1）任务调度（集群环境下，一个服务的多个实例的任务不想同一时间都进行执行）
 
 2）并发修改相关（操作同一个数据）
 
-#### 配置过程
+### 配置过程
 
 封装一个异常类
 
@@ -442,7 +442,7 @@ public class RedisShareLockUtil {
 
 
 
-### Spring注解缓存实现
+## Spring注解缓存实现
 
 > 首先说明：非常不推荐！
 

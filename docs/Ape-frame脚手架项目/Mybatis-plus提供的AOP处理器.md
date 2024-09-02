@@ -1,6 +1,6 @@
 # Mybatis-Plus提供的基于AOP的处理器
 
-> 应用场景：![](./../%E9%B8%A1%E7%BF%85Club%E9%A1%B9%E7%9B%AE/1%E4%B8%80%E6%9C%9F/%E7%9F%A5%E8%AF%86/%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF.jpg)
+> 应用场景：![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF.jpg)
 >
 > 如上表所示的create_by\create_time\update_time\update_by，这一类字段的设置，主要应用在insert和update两个时候，倘若很多表的字段都有这些属性，那么重复的代码就太多了，用AOP切面编程的思想，Mybatis-Plus为我们提供了handler，实现其方法即可
 
@@ -84,7 +84,7 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
 }
 ```
 
-### 为了更好的显示sql日志对于Mybatis专门的日志信息设置
+## 为了更好的显示sql日志对于Mybatis专门的日志信息设置
 
 可以将日志中的???转变为实际数据
 
@@ -348,7 +348,7 @@ public class MybatisConfiguration {
 SQL： [ INSERT INTO user ( name, age, create_by, create_time, delete_flag, version ) VALUES ( "灵魂汁子", 18, "York", Mon Jul 29 10:11:20 CST 2024, 0, 0 ) ]执行耗时[ 2ms ]
 ```
 
-### 但是以上配置我们要做成一个自动装配的优化
+## 但是以上配置我们要做成一个自动装配的优化
 
 > 也就是说，我们要做成如果用户希望使用这样的配置的时候才生效
 
