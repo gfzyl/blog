@@ -1,1 +1,1 @@
-<<<<<<< HEAD
+# york-blog
