@@ -13,7 +13,7 @@ const vitepressSidebarOptions = {
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
     //网站部署的路径，默认根目录
-    base: '/',
+    base: '/blog',
     title: "York-经典鸡粉",
     description: "York的个人技术博客",
 
@@ -23,7 +23,7 @@ export default defineConfig({
     // head
     head: [
         // 站点图标
-        ["link", {rel: "icon", href: "/icon/favicon.ico"}],
+        ["link", {rel: "icon", href: "/blog/icon/favicon.ico"}],
 
         // 谷歌字体
         [
