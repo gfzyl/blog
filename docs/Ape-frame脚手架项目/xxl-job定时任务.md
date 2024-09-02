@@ -211,6 +211,7 @@ public class SampleXxlJob {
 
 ![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E6%9F%A5%E7%9C%8B%E8%B0%83%E5%BA%A6%E6%97%A5%E5%BF%97.jpg)
 
-![](./../%E6%AF%8F%E6%97%A5%E5%AE%8C%E6%88%90%E8%AE%A1%E5%88%92%E6%88%AA%E5%9B%BE/xxl-job/%E8%BF%99%E9%87%8C%E5%8F%AF%E4%BB%A5%E7%9C%8B%E5%88%B0%E6%89%A7%E8%A1%8C%E6%97%A5%E5%BF%97.jpg)
+
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E8%BF%99%E9%87%8C%E5%8F%AF%E4%BB%A5%E7%9C%8B%E5%88%B0%E6%89%A7%E8%A1%8C%E6%97%A5%E5%BF%97.jpg)
 
 这样就大工告成啦

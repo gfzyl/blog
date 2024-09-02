@@ -1,0 +1,28 @@
+{
+  "name": "vitepress-plugin-back-to-top",
+  "version": "1.0.1",
+  "type": "module",
+  "files": ["dist"],
+  "main": "./dist/vitepress-plugin-back-to-top.umd.cjs",
+  "module": "./dist/vitepress-plugin-back-to-top.js",
+  "types": "./dist/main.d.ts",
+  "license": "MIT",
+  "author": "wehuss",
+  "homepage": "https://github.com/wehuss/vitepress-plugin-back-to-top",
+
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build && tsc",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.2.45"
+  },
+  "devDependencies": {
+    "@types/node": "^18.13.0",
+    "@vitejs/plugin-vue": "^4.0.0",
+    "typescript": "^4.9.3",
+    "vite": "^4.1.0",
+    "vue-tsc": "^1.0.24"
+  }
+}

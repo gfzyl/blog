@@ -13,10 +13,10 @@ hero:
   actions:
     - theme: brand
       text: 阅读文章
-      link: /markdown-examples
+      link: /代码随想录算法/
     - theme: alt
       text: q&a
-      link: /q&a/关于我
+      link: /AboutAuthor/
 features:
   - title: Feature A
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
@@ -57,7 +57,7 @@ lastUpdated: true
 * [项目打磨]()
 * [求职心得]()
 
-## [作者介绍](/AboutAuthor)🌟
+## [作者介绍](/AboutAuthor/)🌟
 
 ::: tip 学习愉快
 没啥好说的，感谢您的阅读！😄

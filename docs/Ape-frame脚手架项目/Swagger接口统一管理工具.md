@@ -60,7 +60,7 @@ public class SwaggerConfig {
 
 ```
 
-项目启动以后，浏览器访问http://localhost:8081/swagger-ui.htm即可
+项目启动以后，浏览器访问`http://localhost:8081/swagger-ui.htm`即可
 
 进入以后如图界面
 
