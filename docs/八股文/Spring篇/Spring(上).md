@@ -8,7 +8,7 @@
 
 ## Spring是什么
 
-好的，面试官，spring是一个轻量级的容器框架，奥委会和aop是他的核心。spring将传统的代码以来形式，变为从容器中获取，提高了开发效率，非常的方便。spring衍生出了很多生态，比如，spring-jdbc,springboot等等。方便我们进行各种场景下的开发，以上。
+好的，面试官，spring是一个轻量级的容器框架，ioc和aop是他的核心。spring将传统的代码以来形式，变为从容器中获取，提高了开发效率，非常的方便。spring衍生出了很多生态，比如，spring-jdbc,springboot等等。方便我们进行各种场景下的开发，以上。
 
 ## Spring 优势?
 
