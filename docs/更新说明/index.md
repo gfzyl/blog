@@ -2,11 +2,13 @@
 
 ::: timeline 2024-09-01
 
-- 一个非常棒的开源项目 H5-Dooring 目前 star 3.1k
-    - 开源地址 https://github.com/MrXujiang/h5-Dooring
-    - 基本介绍 http://h5.dooring.cn/doc/zh/guide/
-- 《深入浅出webpack》 http://webpack.wuhaolin.cn/
-  :::
+- 构建个人博客的框架
+  借鉴了很多大佬还有前辈的解决方案
 
-::: timeline 2024-09-01
+::: timeline 2024-09-02
+
+- 博客上线!
+  图床: 腾讯云COS, 解决图片存储问题
+- 终于可以开始随意写博客啦
+
 :::

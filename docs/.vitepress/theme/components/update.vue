@@ -10,7 +10,7 @@ const date = computed(
 
 <template>
   <div class="LastUpdated">
-    <p>最近更新时间: {{ date.toLocaleString() }}</p>
+    <p>最近更新时间 {{ date.toLocaleString() }}</p>
   </div>
 </template>
 
