@@ -1,8 +1,16 @@
 # Swagger接口统一管理工具
 
+::: warning 说明
+
+**注意：**因为Swagger需要对代码打注解，所以具有代码侵入性，建议尽量不要使用Swagger！
+
+:::
+
+
+
 swagger不仅可以用来展示有什么接口，他可以测试，而且速度极快
 
-==注意版本即可，我下面用的是2.7.0==，不同版本引入方式不同
+注意版本即可，我下面用的是2.7.0，不同版本引入方式不同
 
 引入依赖
 
@@ -71,14 +79,10 @@ public class SwaggerConfig {
 上述配置中我们将基本信息都写死了，这样搞很不友好，于是我们把基本信息抽取成为一个bean出来，让用户在yaml中自己配置，然后系统读取这些配置，即读取生成的bean的属性
 
 ```java
-package com.york.swagger.bean;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
-
 /**
  * 优化，为了让使用脚手架的用户可以自定义配置
  */
+@Data
 @Component
 @ConfigurationProperties(prefix = "swagger")
 public class SwaggerInfo {
@@ -95,62 +99,6 @@ public class SwaggerInfo {
     private String version;
 
     private String description;
-
-    public String getBasePackage() {
-        return basePackage;
-    }
-
-    public void setBasePackage(String basePackage) {
-        this.basePackage = basePackage;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContactName() {
-        return contactName;
-    }
-
-    public void setContactName(String contactName) {
-        this.contactName = contactName;
-    }
-
-    public String getContactUrl() {
-        return contactUrl;
-    }
-
-    public void setContactUrl(String contactUrl) {
-        this.contactUrl = contactUrl;
-    }
-
-    public String getContactEmail() {
-        return contactEmail;
-    }
-
-    public void setContactEmail(String contactEmail) {
-        this.contactEmail = contactEmail;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }
 
 ```
@@ -184,8 +132,8 @@ swagger:
 
 打开swagger以后看到的都是英文，缺少必要的中文解释，我们可以用注解
 
-==@ApiOperation(notes = "逻辑删除数据", value = "逻辑删除数据:/logicDelete/{id}")== 在controller的方法上用注解描述，这个就是如下图右侧显示，其中的notes就是点开以后的详细显示
+*@ApiOperation(notes = "逻辑删除数据", value = "逻辑删除数据:/logicDelete/{id}")*  在 **controller** 的方法上用注解描述，这个就是如下图右侧显示，其中的notes就是点开以后的详细显示
 
-==@ApiParam("姓名")== 在Po的属性字段上用这样的注解，就是对字段的描述，在swagger上会显示出来
+*@ApiParam("姓名")*  在Po的属性字段上用这样的注解，就是对字段的描述，在swagger上会显示出来
 
 ![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/swagger%E9%85%8D%E7%BD%AE%E4%BC%98%E5%8C%96.jpg)

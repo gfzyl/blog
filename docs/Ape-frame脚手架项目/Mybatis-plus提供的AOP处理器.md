@@ -4,7 +4,16 @@
 >
 > 如上表所示的create_by\create_time\update_time\update_by，这一类字段的设置，主要应用在insert和update两个时候，倘若很多表的字段都有这些属性，那么重复的代码就太多了，用AOP切面编程的思想，Mybatis-Plus为我们提供了handler，实现其方法即可
 
-首先在对应的Po上面设置相应的属性：，类似下面的代码
+首先在对应的Po上面设置相应的属性，类似下面的代码
+
+::: tip 参数说明
+
+**参数说明：**实体类的属性上加入 @TableField 注解
+
+- **@TableField(fill = FieldFill.INSERT)** ：插入操作的时候生效
+- **@TableField(fill = FieldFill.UPDATE)** ：更新操作的时候生效
+
+:::
 
 ```java
 package com.york.user.entity.po;
@@ -53,6 +62,12 @@ public class UserPo {
 
 然后配置一个处理器，在insert和update的时候触发
 
+::: tip 配置说明
+
+*MetaObjectHandler* 接口是 *mybatisPlus* 为我们提供的的一个扩展接口，我们可以利用这个接口在我们插入或者更新数据的时候，为一些字段指定默认值（**实现这个需求的方法不止一种，在SQL层面也可以做到，在建表的时候也可以指定默认值，但都不够如此灵活**）
+
+:::
+
 ```java
 package com.york.handler;
 
@@ -86,7 +101,17 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
 
 ## 为了更好的显示sql日志对于Mybatis专门的日志信息设置
 
-可以将日志中的???转变为实际数据
+
+
+::: tip 配置说明
+
+Druid监控中看不到具体的完整SQL，那么如果我们想要显示完整SQL，就需要添加一个 MybatisPlus 优化器
+
+**可以将日志中的`???`转变为实际数据**
+
+:::
+
+
 
 1. 配置如下的拦截器
 
@@ -105,7 +130,6 @@ import java.sql.Statement;
 import java.util.*;
 
 @Intercepts(value = {
-
         @Signature(args = {Statement.class, ResultHandler.class}, method = "query", type = StatementHandler.class),
         @Signature(args = {Statement.class}, method = "update", type = StatementHandler.class),
         @Signature(args = {Statement.class}, method = "batch", type = StatementHandler.class)})
@@ -120,7 +144,6 @@ public class SqlBeautyInterceptor implements Interceptor {
         try {
             return invocation.proceed();
         } finally {
-
             long endTime = System.currentTimeMillis();
             long sqlCost = endTime - startTime;
             BoundSql boundSql = statementHandler.getBoundSql();
@@ -129,9 +152,7 @@ public class SqlBeautyInterceptor implements Interceptor {
             List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
             sql = formatSql(sql, parameterObject, parameterMappingList);
             System.out.println("SQL： [ " + sql + " ]执行耗时[ " + sqlCost + "ms ]");
-
         }
-
     }
 
     @Override
@@ -155,7 +176,6 @@ public class SqlBeautyInterceptor implements Interceptor {
         }
 
         String sqlWithoutReplacePlaceholder = sql;
-
         try {
             if (parameterMappingList != null) {
                 Class<?> parameterObjectClass = parameterObject.getClass();
@@ -164,16 +184,13 @@ public class SqlBeautyInterceptor implements Interceptor {
                     if (isList(strictMap.get("list").getClass())) {
                         sql = handleListParameter(sql, strictMap.get("list"));
                     }
-
                 } else if (isMap(parameterObjectClass)) {
                     Map<?, ?> paramMap = (Map<?, ?>) parameterObject;
                     sql = handleMapParameter(sql, paramMap, parameterMappingList);
                 } else {
                     sql = handleCommonParameter(sql, parameterMappingList, parameterObjectClass, parameterObject);
                 }
-
             }
-
         } catch (Exception e) {
             return sqlWithoutReplacePlaceholder;
         }
@@ -181,9 +198,7 @@ public class SqlBeautyInterceptor implements Interceptor {
     }
 
     private String handleCommonParameter(String sql, List<ParameterMapping> parameterMappingList,
-
                                          Class<?> parameterObjectClass, Object parameterObject) throws Exception {
-
         Class<?> originalParameterObjectClass = parameterObjectClass;
         List<Field> allFieldList = new ArrayList<>();
         while (parameterObjectClass != null) {
@@ -205,9 +220,7 @@ public class SqlBeautyInterceptor implements Interceptor {
                     if (everyField.getName().equals(propertyName)) {
                         field = everyField;
                     }
-
                 }
-
                 field.setAccessible(true);
                 propertyValue = String.valueOf(field.get(parameterObject));
                 if (parameterMapping.getJavaType().isAssignableFrom(String.class)) {
@@ -215,37 +228,29 @@ public class SqlBeautyInterceptor implements Interceptor {
                 }
             }
             sql = sql.replaceFirst("\\?", propertyValue);
-
         }
-
         return sql;
-
     }
 
     private String handleMapParameter(String sql, Map<?, ?> paramMap, List<ParameterMapping> parameterMappingList) {
-
         for (ParameterMapping parameterMapping : parameterMappingList) {
             Object propertyName = parameterMapping.getProperty();
             Object propertyValue = paramMap.get(propertyName);
-
             if (propertyValue != null) {
                 if (propertyValue.getClass().isAssignableFrom(String.class)) {
                     propertyValue = "\"" + propertyValue + "\"";
                 }
                 sql = sql.replaceFirst("\\?", propertyValue.toString());
             }
-
         }
         return sql;
     }
 
     private String handleListParameter(String sql, Collection<?> col) {
-
         if (col != null && col.size() != 0) {
             for (Object obj : col) {
                 String value = null;
                 Class<?> objClass = obj.getClass();
-
                 if (isPrimitiveOrPrimitiveWrapper(objClass)) {
                     value = obj.toString();
                 } else if (objClass.isAssignableFrom(String.class)) {
@@ -253,23 +258,17 @@ public class SqlBeautyInterceptor implements Interceptor {
                 }
                 sql = sql.replaceFirst("\\?", value);
             }
-
         }
-
         return sql;
-
     }
 
     private String beautifySql(String sql) {
         sql = sql.replaceAll("[\\s\n ]+", " ");
         return sql;
-
     }
 
     private boolean isPrimitiveOrPrimitiveWrapper(Class<?> parameterObjectClass) {
-
         return parameterObjectClass.isPrimitive() || (parameterObjectClass.isAssignableFrom(Byte.class)
-
                 || parameterObjectClass.isAssignableFrom(Short.class)
                 || parameterObjectClass.isAssignableFrom(Integer.class)
                 || parameterObjectClass.isAssignableFrom(Long.class)
@@ -282,7 +281,6 @@ public class SqlBeautyInterceptor implements Interceptor {
     /**
      * 是否DefaultSqlSession的内部类StrictMap
      */
-
     private boolean isStrictMap(Class<?> parameterObjectClass) {
         return parameterObjectClass.isAssignableFrom(StrictMap.class);
     }
@@ -290,7 +288,6 @@ public class SqlBeautyInterceptor implements Interceptor {
     /**
      * 是否List的实现类
      */
-
     private boolean isList(Class<?> clazz) {
 
         Class<?>[] interfaceClasses = clazz.getInterfaces();
@@ -298,7 +295,6 @@ public class SqlBeautyInterceptor implements Interceptor {
             if (interfaceClass.isAssignableFrom(List.class)) {
                 return true;
             }
-
         }
         return false;
     }
@@ -306,11 +302,9 @@ public class SqlBeautyInterceptor implements Interceptor {
     /**
      * 是否Map的实现类
      */
-
     private boolean isMap(Class<?> parameterObjectClass) {
 
         Class<?>[] interfaceClasses = parameterObjectClass.getInterfaces();
-
         for (Class<?> interfaceClass : interfaceClasses) {
             if (interfaceClass.isAssignableFrom(Map.class)) {
                 return true;
@@ -323,6 +317,14 @@ public class SqlBeautyInterceptor implements Interceptor {
 ```
 
 2. 配置如下的config
+
+::: tip config
+
+**说明：**如果想要使用 *SqlBeautyInterceptor* 类，那么我们需要将这个类**集成进我们的框架**，就需要创建相应的配置类！
+
+把 *SqlBeautyInterceptor* 这个类注入即可
+
+:::
 
 ```java
 package com.york.config;
@@ -342,15 +344,17 @@ public class MybatisConfiguration {
 
 ```
 
-==**执行效果如下**==
+**执行效果如下**
 
 ```
 SQL： [ INSERT INTO user ( name, age, create_by, create_time, delete_flag, version ) VALUES ( "灵魂汁子", 18, "York", Mon Jul 29 10:11:20 CST 2024, 0, 0 ) ]执行耗时[ 2ms ]
 ```
 
-## 但是以上配置我们要做成一个自动装配的优化
+## 以上配置可以优化——做成一个自动装配的效果
 
 > 也就是说，我们要做成如果用户希望使用这样的配置的时候才生效
+>
+> 这样也体现了可插拔的特点
 
 ```java
 @Configuration
@@ -366,6 +370,43 @@ public class MybatisConfiguration {
 }
 ```
 
-关键就在于这里的==**@ConditionOnProperty**==，它决定了该配置类是否注入容器
+关键就在于这里的**@ConditionOnProperty**，它决定了 **根据读取的配置信息** ,决定该Bean是否注入容器
 
 这样就可以看我们在yml中配置sql.beauty.show是否是开启的，从而是否打开上面的日志配置
+
+
+
+## 逻辑删除拦截器
+
+**问题：**因为我们数据库中有逻辑删除的delete_flag字段，那么我们每次进行删除的时候，需要手动去update为1。
+
+**说明：**如果可以自动化修改，那么可以节省我们大量的操作，MybatisPlus给我们提供了这一功能！
+
+### 配置MybatisPlus逻辑删除
+
+#### 添加相关配置
+
+**ape-common-web的pom.xml文件：**
+
+```yml
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: delete_flag
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+```
+
+**注意：**逻辑删除字段logic-delete-field要写**数据库里的字段**，而**不是实体内**的！
+
+#### **实体类添加@TableLogic注解**
+
+ ```java
+ /**
+  * 逻辑删除字段，需要用@TableLogic标识，配合yml中的配置才能找到
+  */
+ @TableLogic
+ @TableField(fill = FieldFill.INSERT)
+ private Integer deleteFlag;
+ ```
+

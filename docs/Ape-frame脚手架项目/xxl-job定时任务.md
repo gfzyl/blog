@@ -1,6 +1,12 @@
 # 为什么用xxl-job
 
-由于SpringBoot自带的定时任务有诸多缺点，例如调度任务的程序是分布式的，需要我们在程序中实现分布式锁，有诸多的弊端，所以选择集成 ==**xxl-job**== 来实现定时任务！
+::: tip xxl-job
+
+由于SpringBoot自带的定时任务有诸多缺点，例如调度任务的程序是分布式的，需要我们在程序中实现分布式锁，有诸多的弊端，所以选择集成 **xxl-job** 来实现定时任务！
+
+:::
+
+
 
 ## 如何使用
 
@@ -12,7 +18,7 @@
 
 以后就直接用
 
-首先打开==下载==好的项目，打开其中的db目录可以看到执行xxl-job的后台的sql，先把这个sql在数据库中运行起来
+首先打开 **下载** 好的项目，打开其中的db目录可以看到执行xxl-job的后台的sql，先把这个sql在数据库中运行起来
 
 ![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/xxl-job%E4%BD%BF%E7%94%A8%E4%B9%8B%E5%89%8D%E7%9A%84%E6%95%B0%E6%8D%AE%E5%BA%93%E6%93%8D%E4%BD%9C.jpg)
 
@@ -22,9 +28,17 @@
 
 调完这些以后就可以启动服务登录啦
 
-登录账号是admin
+::: tip 注意
 
-密码是123456
+默认的:
+
+登录账号是 **admin**
+
+密码是 **123456**
+
+:::
+
+
 
 ![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E5%A6%82%E4%BD%95%E8%BF%9B%E5%85%A5XXLJOB%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E4%B8%AD%E5%BF%83.jpg)
 
@@ -54,7 +68,8 @@ xxl:
       addresses: http://127.0.0.1:8080/xxl-job-admin
     accessToken: default_token
     executor:
-      appname: ape-frame
+      # 自己写的
+      appname: ape-frame 
       address:
       # 下面就是xxl-job
       ip: 127.0.0.1
@@ -66,7 +81,7 @@ xxl:
 
 按照以上内容配制好，需要由configuration类读取这些配置信息进而加载
 
-==@ConditionalOnProperty(name = {"xxl.job.enable"}, havingValue = "true")== 我真是爱死了，可插拔，这样配置就可以完全自己选择啦
+*@ConditionalOnProperty(name = {"xxl.job.enable"}, havingValue = "true")* 我真是爱死了，可插拔，这样配置就可以完全自己选择啦
 
 ```java
 package com.york.job.config.config;
@@ -199,7 +214,7 @@ public class SampleXxlJob {
 
 以上是我们设置的一个简单样例，就是相当于让他去执行我们的任务做一个调度
 
-==@XxlJob("demoJobHandler")== 用这个注解的方式，将其中方法新增到任务管理中，可以看到我们JobHandler就是这个注解的值（方法名）
+**@XxlJob("demoJobHandler")**  用这个注解的方式，将其中方法新增到任务管理中，可以看到我们 **JobHandler** 就是这个注解的值（方法名）
 
 ![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E6%96%B0%E5%A2%9E%E4%BB%BB%E5%8A%A1.jpg)
 
