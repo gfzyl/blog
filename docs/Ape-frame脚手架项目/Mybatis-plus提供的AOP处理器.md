@@ -1,14 +1,16 @@
 # Mybatis-Plus提供的基于AOP的处理器
 
-> 应用场景：![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF.jpg)
 >
-> 如上表所示的create_by\create_time\update_time\update_by，这一类字段的设置，主要应用在insert和update两个时候，倘若很多表的字段都有这些属性，那么重复的代码就太多了，用AOP切面编程的思想，Mybatis-Plus为我们提供了handler，实现其方法即可
+应用场景：![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF.jpg)
+>
+>
+如上表所示的create_by\create_time\update_time\update_by，这一类字段的设置，主要应用在insert和update两个时候，倘若很多表的字段都有这些属性，那么重复的代码就太多了，用AOP切面编程的思想，Mybatis-Plus为我们提供了handler，实现其方法即可
 
 首先在对应的Po上面设置相应的属性，类似下面的代码
 
 ::: tip 参数说明
 
-**参数说明：**实体类的属性上加入 @TableField 注解
+**参数说明**：实体类的属性上加入 @TableField 注解
 
 - **@TableField(fill = FieldFill.INSERT)** ：插入操作的时候生效
 - **@TableField(fill = FieldFill.UPDATE)** ：更新操作的时候生效
@@ -64,7 +66,8 @@ public class UserPo {
 
 ::: tip 配置说明
 
-*MetaObjectHandler* 接口是 *mybatisPlus* 为我们提供的的一个扩展接口，我们可以利用这个接口在我们插入或者更新数据的时候，为一些字段指定默认值（**实现这个需求的方法不止一种，在SQL层面也可以做到，在建表的时候也可以指定默认值，但都不够如此灵活**）
+*MetaObjectHandler* 接口是 *mybatisPlus* 为我们提供的的一个扩展接口，我们可以利用这个接口在我们插入或者更新数据的时候，为一些字段指定默认值（
+**实现这个需求的方法不止一种，在SQL层面也可以做到，在建表的时候也可以指定默认值，但都不够如此灵活**）
 
 :::
 
@@ -101,8 +104,6 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
 
 ## 为了更好的显示sql日志对于Mybatis专门的日志信息设置
 
-
-
 ::: tip 配置说明
 
 Druid监控中看不到具体的完整SQL，那么如果我们想要显示完整SQL，就需要添加一个 MybatisPlus 优化器
@@ -110,8 +111,6 @@ Druid监控中看不到具体的完整SQL，那么如果我们想要显示完整
 **可以将日志中的`???`转变为实际数据**
 
 :::
-
-
 
 1. 配置如下的拦截器
 
@@ -373,8 +372,6 @@ public class MybatisConfiguration {
 关键就在于这里的 **@ConditionOnProperty**，它决定了 **根据读取的配置信息** ,决定该Bean是否注入容器
 
 这样就可以看我们在yml中配置sql.beauty.show是否是开启的，从而是否打开上面的日志配置
-
-
 
 ## 逻辑删除拦截器
 
