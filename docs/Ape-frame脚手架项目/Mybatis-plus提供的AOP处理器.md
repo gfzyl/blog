@@ -370,7 +370,7 @@ public class MybatisConfiguration {
 }
 ```
 
-关键就在于这里的**@ConditionOnProperty**，它决定了 **根据读取的配置信息** ,决定该Bean是否注入容器
+关键就在于这里的 **@ConditionOnProperty**，它决定了 **根据读取的配置信息** ,决定该Bean是否注入容器
 
 这样就可以看我们在yml中配置sql.beauty.show是否是开启的，从而是否打开上面的日志配置
 
@@ -378,9 +378,9 @@ public class MybatisConfiguration {
 
 ## 逻辑删除拦截器
 
-**问题：**因为我们数据库中有逻辑删除的delete_flag字段，那么我们每次进行删除的时候，需要手动去update为1。
+**问题**：因为我们数据库中有逻辑删除的delete_flag字段，那么我们每次进行删除的时候，需要手动去update为1。
 
-**说明：**如果可以自动化修改，那么可以节省我们大量的操作，MybatisPlus给我们提供了这一功能！
+**说明**：如果可以自动化修改，那么可以节省我们大量的操作，MybatisPlus给我们提供了这一功能！
 
 ### 配置MybatisPlus逻辑删除
 

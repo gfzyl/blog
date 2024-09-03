@@ -2,17 +2,18 @@
 
 ::: tip xxl-job
 
-由于SpringBoot自带的定时任务有诸多缺点，例如调度任务的程序是分布式的，需要我们在程序中实现分布式锁，有诸多的弊端，所以选择集成 **xxl-job** 来实现定时任务！
+由于SpringBoot自带的定时任务有诸多缺点，例如调度任务的程序是分布式的，需要我们在程序中实现分布式锁，有诸多的弊端，所以选择集成
+**xxl-job** 来实现定时任务！
 
 :::
-
-
 
 ## 如何使用
 
 ###一、运行xxl-job服务端
 
-**说明：**我们将该代码下载下来，可以看到下面的目录，最关键的是 **xxl-job-admin**（使用的模块），如果没有相关依赖可以将 xxl-job-core 模块使用maven进行install打包即可（打包完成版本为xxl-job-core-2.4.0-SNAPSHOT.jar），剩下的 xxl-job-executor-samples 则是官方集成的一个简易案例（我们可以进行参考）！
+**说明**：我们将该代码下载下来，可以看到下面的目录，最关键的是 **xxl-job-admin**（使用的模块），如果没有相关依赖可以将
+xxl-job-core 模块使用maven进行install打包即可（打包完成版本为xxl-job-core-2.4.0-SNAPSHOT.jar），剩下的
+xxl-job-executor-samples 则是官方集成的一个简易案例（我们可以进行参考）！
 
 我下载的路径在：D:\Project\workspace4idea\myproject\xxl-job-2.4.1
 
@@ -38,8 +39,6 @@
 
 :::
 
-
-
 ![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E5%A6%82%E4%BD%95%E8%BF%9B%E5%85%A5XXLJOB%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E4%B8%AD%E5%BF%83.jpg)
 
 ![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E8%BF%9B%E5%85%A5%E4%BB%A5%E5%90%8E.jpg)
@@ -49,6 +48,7 @@
 首先先引入依赖
 
 ```xml
+
 <dependency>
     <groupId>com.xuxueli</groupId>
     <artifactId>xxl-job-core</artifactId>
@@ -69,7 +69,7 @@ xxl:
     accessToken: default_token
     executor:
       # 自己写的
-      appname: ape-frame 
+      appname: ape-frame
       address:
       # 下面就是xxl-job
       ip: 127.0.0.1
@@ -225,7 +225,6 @@ public class SampleXxlJob {
 接着就可以选择执行，执行完以后可以看到日志
 
 ![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E6%9F%A5%E7%9C%8B%E8%B0%83%E5%BA%A6%E6%97%A5%E5%BF%97.jpg)
-
 
 ![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E8%BF%99%E9%87%8C%E5%8F%AF%E4%BB%A5%E7%9C%8B%E5%88%B0%E6%89%A7%E8%A1%8C%E6%97%A5%E5%BF%97.jpg)
 

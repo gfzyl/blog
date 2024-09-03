@@ -2,11 +2,9 @@
 
 ::: warning 说明
 
-**注意：**因为Swagger需要对代码打注解，所以具有代码侵入性，建议尽量不要使用Swagger！
+**注意**：因为Swagger需要对代码打注解，所以具有代码侵入性，建议尽量不要使用Swagger！
 
 :::
-
-
 
 swagger不仅可以用来展示有什么接口，他可以测试，而且速度极快
 
@@ -15,6 +13,7 @@ swagger不仅可以用来展示有什么接口，他可以测试，而且速度�
 引入依赖
 
 ```xml
+
 <dependency>
     <groupId>io.springfox</groupId>
     <artifactId>springfox-swagger-ui</artifactId>
@@ -111,7 +110,7 @@ public class SwaggerInfo {
 swagger:
   basePackage: com.qj
   title: ape-sys
-  contactName: 
+  contactName:
   contactUrl: git@git/ape-frame.git
   contactEmail: @qq.com
   version: 1.0版本
@@ -121,7 +120,7 @@ swagger:
 swagger:
   base-package: com.qj
   title: ape-sys
-  contact-name: 
+  contact-name:
   contactUrl: g
   contact-email: 23
   version: 1.0版本
@@ -132,7 +131,8 @@ swagger:
 
 打开swagger以后看到的都是英文，缺少必要的中文解释，我们可以用注解
 
-*@ApiOperation(notes = "逻辑删除数据", value = "逻辑删除数据:/logicDelete/{id}")*  在 **controller** 的方法上用注解描述，这个就是如下图右侧显示，其中的notes就是点开以后的详细显示
+*@ApiOperation(notes = "逻辑删除数据", value = "逻辑删除数据:/logicDelete/{id}")*  在 **controller**
+的方法上用注解描述，这个就是如下图右侧显示，其中的notes就是点开以后的详细显示
 
 *@ApiParam("姓名")*  在Po的属性字段上用这样的注解，就是对字段的描述，在swagger上会显示出来
 

@@ -210,11 +210,12 @@ public class SysUserExcelExport extends BaseEasyExcelExport<SysUser> {
 可以看到我们只需要在其中实现几个重要的方法
 
 * `exportWithBigData(String fileName, Map<String, Object> conditions)`该方法确定==导出名==和==导出的条件==
-*  `getExcelHead()` 该方法用于生成的excel表的列名
+* `getExcelHead()` 该方法用于生成的excel表的列名
 * `dataTotalCount(Map<String, Object> conditions)` 该方法用于用条件conditions去查到==总数==
 * `eachSheetTotalCount()` 该方法用于设定每一个==sheet==的总数
 * `eachTimesWriteSheetTotalCount()` 该方法用于写总共多少个sheet
-* `buildDataList(List<List<String>> resultList, Map<String, Object> condition, Long pageNo, Long pageSize)` 该方法用于构建产生最后结果`List<List<String>> resultList`
+* `buildDataList(List<List<String>> resultList, Map<String, Object> condition, Long pageNo, Long pageSize)`
+  该方法用于构建产生最后结果`List<List<String>> resultList`
 
 这样我们就可以大胆的用一个controller去测试了
 

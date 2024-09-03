@@ -32,7 +32,7 @@ public class WebSocketConfig {
 
 ==WebSocketCheckConfig鉴权配置类==
 
-**说明：**业务场景中可能不能什么用户都可以进行访问WebSocket，所以需要进行鉴权和配置相关信息的功能！
+**说明**：业务场景中可能不能什么用户都可以进行访问WebSocket，所以需要进行鉴权和配置相关信息的功能！
 
 ```java
 package com.york.websocket.config;

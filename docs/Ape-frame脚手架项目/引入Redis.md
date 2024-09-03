@@ -14,20 +14,23 @@
 
 ![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com/APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/Redis%E6%9C%AA%E5%81%9AJackson%E5%BA%8F%E5%88%97%E5%8C%96%E6%97%B6%E5%BC%95%E5%87%BA%E7%9A%84%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98.jpg)
 
-总的来说，**key** 或者 **hashKey** 本来就是字符串，用 **String** 的序列化器即可，而 **value** 或者 **hashValue** 的话很多是对象，需要用到 **JSON**  序列化方式，之所以乱码是因为 **原生JDK的序列化方式** 弄出来的结果是如上图一样的人类不可读的东西，所以为了可读性我们要配置一下序列化方式
+总的来说，**key** 或者 **hashKey** 本来就是字符串，用 **String** 的序列化器即可，而 **value** 或者 **hashValue**
+的话很多是对象，需要用到 **JSON**  序列化方式，之所以乱码是因为 **原生JDK的序列化方式**
+弄出来的结果是如上图一样的人类不可读的东西，所以为了可读性我们要配置一下序列化方式
 
 需要引入如下依赖 `jackson-annotations` 和 `jackson-databind`
 
 ```xml
+
 <dependency>
     <groupId>com.fasterxml.jackson.core</groupId>
     <artifactId>jackson-annotations</artifactId>
     <version>2.8.5</version>
 </dependency>
 <dependency>
-    <groupId>com.fasterxml.jackson.core</groupId>
-    <artifactId>jackson-databind</artifactId>
-    <version>2.11.4</version>
+<groupId>com.fasterxml.jackson.core</groupId>
+<artifactId>jackson-databind</artifactId>
+<version>2.11.4</version>
 </dependency>
 ```
 
@@ -188,8 +191,6 @@ public class RedisUtil {
 
 :::
 
-
-
 1. 首先定义一个抽象类，给子类提供模板，继承即可在initCache中选择预热要加入的数据
 
    ```java
@@ -269,11 +270,11 @@ public class RedisUtil {
 
    按照这种逻辑，对应于SysUser就可以启动时预热一个数据，即`"SYS_USER":"York"`，其他类可以仿照, 当然要预热的数据也是按照自己的需求去做
 
-   
 
 2. 我们已经配置好了上面的预热数据，那么最重要的 **initCache()** 由谁来调用呢？
 
-   这就是最关键的点，首先引出了 **接口CommandLineRunner**，实现该接口的 **run** 方法，就可以在项目启动时运行run方法中的代码，所以其实预热就是在项目启动时将上面 **initCache()** 在这里调用
+   这就是最关键的点，首先引出了 **接口CommandLineRunner**，实现该接口的 **run** 方法，就可以在项目启动时运行run方法中的代码，所以其实预热就是在项目启动时将上面
+   **initCache()** 在这里调用
 
    ```java
    import org.springframework.boot.CommandLineRunner;
@@ -293,16 +294,12 @@ public class RedisUtil {
    }
    ```
 
-   
+::: warning 问题引出
 
-   ::: warning 问题引出
-   
-   有傻瓜式的运行方式，即只要有一个继承了AbstractCache的类就主动的new一个该对象然后在这里调用，但是这样就很蠢，有一种更高效更自动的方式
-   
-   :::
-   
-   
-   
+有傻瓜式的运行方式，即只要有一个继承了AbstractCache的类就主动的new一个该对象然后在这里调用，但是这样就很蠢，有一种更高效更自动的方式
+
+:::
+
    ```java
    @SpringBootApplication
    @MapperScan(value = "com.york.*.mapper")
@@ -313,31 +310,28 @@ public class RedisUtil {
        }
    }
    ```
-   
-   首先，看这里的 **ApplicationContext** 就知道了，这是熟悉的Spring容器，里面注入了各种bean
-   
-   如果我们把继承了 **AbstractCache** 的类都 **注入到容器中**，然后从容器中取出来这些对象，统一的调用他们的 *initCache()*，这样如果我们再继承AbstractCache，就全可以取出来并执行initCache()方法
-   
-   
-   
-   ::: tip 实现机制
-   
-   当一个类实现了ApplicationContextAware接口之后,
-   
-   这个类就可以方便的获得ApplicationContext对象（Spring上下文）,
-   
-   Spring发现某个Bean实现了 **ApplicationContextAware** 接口,
-   
-   Spring容器会在创建该Bean之后，自动调用该Bean的 **setApplicationContext**（参数）方法,
-   
-   调用该方法时，会将容器本身ApplicationContext对象作为参数传递给该方法,
-   
-   因此 **applicationContext** 中就存有了初始化的容器中注入的所有对象
-   
-   :::
-   
-   
-   
+
+首先，看这里的 **ApplicationContext** 就知道了，这是熟悉的Spring容器，里面注入了各种bean
+
+如果我们把继承了 **AbstractCache** 的类都 **注入到容器中**，然后从容器中取出来这些对象，统一的调用他们的 *initCache()*
+，这样如果我们再继承AbstractCache，就全可以取出来并执行initCache()方法
+
+::: tip 实现机制
+
+当一个类实现了ApplicationContextAware接口之后,
+
+这个类就可以方便的获得ApplicationContext对象（Spring上下文）,
+
+Spring发现某个Bean实现了 **ApplicationContextAware** 接口,
+
+Spring容器会在创建该Bean之后，自动调用该Bean的 **setApplicationContext**（参数）方法,
+
+调用该方法时，会将容器本身ApplicationContext对象作为参数传递给该方法,
+
+因此 **applicationContext** 中就存有了初始化的容器中注入的所有对象
+
+:::
+
    ```java
    package com.york.redis.util;
    
@@ -372,13 +366,14 @@ public class RedisUtil {
        }
    }
    ```
-   
-   注释已经很详细了，就是这个bean是在容器注入完以后，自动调用 **setApplicationContext** 将 **applicationContext** 设置为容器对象，这样*applicationContext* 就是我们的容器
-   
-   ### 最后的 *InitCache* 实现方式
-   
-   **通过逐一获取容器中继承了 AbstractCache 的 bean, 遍历调用 initCache 方法**
-   
+
+注释已经很详细了，就是这个bean是在容器注入完以后，自动调用 **setApplicationContext** 将 **applicationContext** 设置为容器对象，这样
+*applicationContext* 就是我们的容器
+
+### 最后的 *InitCache* 实现方式
+
+**通过逐一获取容器中继承了 AbstractCache 的 bean, 遍历调用 initCache 方法**
+
    ```java
    package com.york.redis.init;
    
@@ -423,37 +418,33 @@ public class RedisUtil {
        }
    }
    ```
-   
-   所以最后的我们的配置就是这样的，而且还`"init.cache.enable"`优化了这个配置，默认打开了缓存预热，只要想对不同对象进行缓存预热，就继承AbstractCache
-   
+
+所以最后的我们的配置就是这样的，而且还`"init.cache.enable"`优化了这个配置，默认打开了缓存预热，只要想对不同对象进行缓存预热，就继承AbstractCache
+
    ```java
    # 自定义的redis预热启动
    init:
      cache:
        enable: true
    ```
-   
-   
 
 ## 分布式锁
 
 ::: tip 说明
 
-**说明：**为了脚手架的的实现，此处不使用 **Redission** 来直接实现，完全手动实现一个抢占式的分布式锁
+**说明**：为了脚手架的的实现，此处不使用 **Redission** 来直接实现，完全手动实现一个抢占式的分布式锁
 
-Redisson 是一个功能强大的 Redis 客户端库，它将 Redis 的基本功能扩展为一个全面的分布式工具包，适用于构建高可用、高性能的分布式应用程序。如果你的应用需要分布式锁、分布式集合、分布式缓存或其他高级分布式功能，Redisson 是一个非常好的选择。
+Redisson 是一个功能强大的 Redis 客户端库，它将 Redis
+的基本功能扩展为一个全面的分布式工具包，适用于构建高可用、高性能的分布式应用程序。如果你的应用需要分布式锁、分布式集合、分布式缓存或其他高级分布式功能，Redisson
+是一个非常好的选择。
 
 :::
-
-
 
 ### 使用场景
 
 1）任务调度（集群环境下，一个服务的多个实例的任务不想同一时间都进行执行）
 
 2）并发修改相关（操作同一个数据）
-
-
 
 ### 配置过程
 
@@ -475,7 +466,8 @@ public class ShareLockException extends RuntimeException {
 
 ```
 
-然后写一个 **RedisShareLockUtil**，核心原理就是用redis的 *setnx* 是一个 **原子性** 的操作，如果key存在就会失败，只有key不存在才行，因此用setnx的方法就是获取锁的方法
+然后写一个 **RedisShareLockUtil**，核心原理就是用redis的 *setnx* 是一个 **原子性**
+的操作，如果key存在就会失败，只有key不存在才行，因此用setnx的方法就是获取锁的方法
 
 ```java
 package com.york.redis.util;
@@ -557,17 +549,16 @@ public class RedisShareLockUtil {
 }
 ```
 
-
-
 ## Spring注解缓存实现
 
 > 首先说明：非常不推荐！
 
 说明1：因为查询的时候，每次都走数据库会导致查询非常缓慢，所以Spring提供了一套缓存机制，在查询相同接口的时候会先查询缓存，再查询数据库，大大提高了接口响应速度！
-说明2：Spring Boot会自动配置合适的CacheManager作为相关缓存的提供程序（此处配置了Redis的CacheManager），当你在配置类(@Configuration)上使用@EnableCaching注解时，会触发一个后处理器(post processor )，它检查每个Spring bean，查看是否已经存在注解对应的缓存；如果找到了，就会自动创建一个代理拦截方法调用，使用缓存的bean执行处理。
-注意：**在实际工作中基本不使用Spring注解缓存，因为无法为每个缓存单独设置过期时间（除非为每个缓存进行单独的配置），很可能导致整个业务产生缓存雪崩现象的出现！**
-
-
+说明2：Spring Boot会自动配置合适的CacheManager作为相关缓存的提供程序（此处配置了Redis的CacheManager），当你在配置类(
+@Configuration)上使用@EnableCaching注解时，会触发一个后处理器(post processor )，它检查每个Spring
+bean，查看是否已经存在注解对应的缓存；如果找到了，就会自动创建一个代理拦截方法调用，使用缓存的bean执行处理。
+注意：**在实际工作中基本不使用Spring注解缓存，因为无法为每个缓存单独设置过期时间（除非为每个缓存进行单独的配置），很可能导致整个业务产生缓存雪崩现象的出现！
+**
 
 ## Redis 实现延时队列
 
@@ -575,23 +566,28 @@ public class RedisShareLockUtil {
 
 1. 前言
 
-**说明：**我们有一个任务的情况下，我们会期望这个任务在某个时间点去执行，那么就要使用延时队列。一般延时队列可以使用 *RabbitMQ* 或者*RocketMQ* 来进行实现，另外一种常用的方式就是使用 *Redis* 来进行实现了！
+**说明**：我们有一个任务的情况下，我们会期望这个任务在某个时间点去执行，那么就要使用延时队列。一般延时队列可以使用
+*RabbitMQ* 或者*RocketMQ* 来进行实现，另外一种常用的方式就是使用 *Redis* 来进行实现了！
 
-**实现方案：**基于redis来进行实现，我们主要使用的是 **zset这个数据类型天生的具有score的特性**。
+**实现方案**：基于redis来进行实现，我们主要使用的是 **zset这个数据类型天生的具有score的特性**。
 
-<u>zset可以根据score放入，而且可以通过range进行排序获取，以及删除指定的值</u>。从业务上，我们可以再新增任务的时候放入，再通过定时任务进行拉取，要 *注意的一点就是拉取的时候要有分布式锁，不要进行重复拉取，或者交由分布式任务调度来处理拉取，都是可以的*。
+<u>zset可以根据score放入，而且可以通过range进行排序获取，以及删除指定的值</u>。从业务上，我们可以再新增任务的时候放入，再通过定时任务进行拉取，要
+*注意的一点就是拉取的时候要有分布式锁，不要进行重复拉取，或者交由分布式任务调度来处理拉取，都是可以的*。
 
-**使用场景：**我们更加偏向于 **定时群发，定时取消** 等。就举一个发博客的例子吧，博客我们可以选择定时发布，那么就可以应用redis的延迟队列来进行实现。<u>要注意的一个点就是小心大key的产生，要做好延迟队列的key的隔离</u>。
+**使用场景：**我们更加偏向于 **定时群发，定时取消**
+等。就举一个发博客的例子吧，博客我们可以选择定时发布，那么就可以应用redis的延迟队列来进行实现。<u>
+要注意的一个点就是小心大key的产生，要做好延迟队列的key的隔离</u>。
 
 2. 任务对延迟队列的推送方法和拉取的方法
 
 **实现思路：**
 
-**入队：**入队消息体一定要有时间的概念，<u>把时间转换为毫秒，来作为我们zset的score</u>；
+**入队**：入队消息体一定要有时间的概念，<u>把时间转换为毫秒，来作为我们zset的score</u>；
 
 底层就是zset的add方法，由key，value以及score来组成。
 
-**出队：**<u>出队要基于rangeByScore来进行实现，指定我们的score的区间，也就是我们要拉取哪些的任务</u>，拉取成功之后，我们先去执行业务逻辑，执行成功之后，我们再将其从消息队列进行删除。
+**出队：**<u>出队要基于rangeByScore来进行实现，指定我们的score的区间，也就是我们要拉取哪些的任务</u>
+，拉取成功之后，我们先去执行业务逻辑，执行成功之后，我们再将其从消息队列进行删除。
 
 :::
 
