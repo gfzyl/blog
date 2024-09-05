@@ -10,7 +10,7 @@
 
 ## [HTTP 和 HTTPS 有什么区别？（重要）](#http-和-https-有什么区别-重要)
 
-![HTTP 和 HTTPS 对比](https://oss.javaguide.cn/github/javaguide/cs-basics/network/http-vs-https.png)HTTP 和 HTTPS 对比
+![HTTP 和 HTTPS 对比](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/http-vs-https.png)HTTP 和 HTTPS 对比
 
 - **端口号**：HTTP 默认是 80，HTTPS 默认是 443。
 - **URL 前缀**：HTTP 的 URL 前缀是 `http://`，HTTPS 的 URL 前缀是 `https://`。
