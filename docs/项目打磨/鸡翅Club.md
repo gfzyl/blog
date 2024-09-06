@@ -1,5 +1,15 @@
 # 鸡翅Club项目专区
 
+## 数据库设计
+
+目前来说，项目还有足够大的完善空间，如社区的交流能力，以及题目练习的能力，我现阶段提供的数据表共有14张，可以扩展
+
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E9%B8%A1%E7%BF%85.jpg)
+
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E9%B8%A1%E7%BF%85%E6%95%B0%E6%8D%AE%E8%A1%A82.jpg)
+
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E9%B8%A1%E7%BF%85%E6%95%B0%E6%8D%AE%E8%A1%A83.jpg)
+
 ## 1.介绍一下你这个项目吧![](https://img.shields.io/badge/重要-red)
 
 好的，面试官，接下来我来阐述一个这个项目的业务是什么。
