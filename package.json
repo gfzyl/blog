@@ -15,7 +15,9 @@
     "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
+    "axios": "^1.7.7",
     "vitepress-markdown-timeline": "^1.2.1",
-    "vitepress-plugin-comment-with-giscus": "^1.1.15"
+    "vitepress-plugin-comment-with-giscus": "^1.1.15",
+    "vue-activity-calendar": "^1.2.2"
   }
 }
