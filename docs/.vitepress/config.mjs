@@ -84,7 +84,7 @@ export default defineConfig({
                 let htmlResult = slf.renderToken(tokens, idx, options);
                 if (tokens[idx].tag === 'h1'){
                     htmlResult += `<ArticleMetadata />`;
-                    htmlResult += `<CheckIn />`;
+                    // htmlResult += `<CheckIn />`;
                 }
                 return htmlResult;
             };
