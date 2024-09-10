@@ -21,6 +21,12 @@ import giscusTalk from 'vitepress-plugin-comment-with-giscus';
 import {useData, useRoute} from 'vitepress';
 // BackToTop
 import BackToTop from './components/BackToTop.vue'
+// ActivityCalendar
+import {ActivityCalendar} from "vue-activity-calendar";
+//同时引入css文件，确保基本样式可用
+import "vue-activity-calendar/style.css";
+// 打卡
+import CheckIn from "./components/CheckIn.vue";
 
 import './style.css'
 import './index.css'
@@ -46,7 +52,17 @@ export default {
         app.component("Confetti", Confetti); //五彩纸屑注册全局组件
         app.component('update', update); //更新时间注册全局
         app.component('ArticleMetadata', ArticleMetadata); //字数统计
+        app.component('ActivityCalendar', ActivityCalendar); // 背诵统计
+        app.component('CheckIn', CheckIn); //打卡
         // ...
+        // 在页面加载后处理标题
+        router.onAfterRouteChanged = () => {
+            const pageId = `page-${Math.random().toString(36).substr(2, 9)}`;
+            document.querySelectorAll('h1').forEach((heading, index) => {
+                heading.id = `page-${index}`;
+                heading.insertAdjacentHTML('afterend', `<CheckIn pageId="${heading.id}" />`);
+            });
+        };
     },
     setup() {
         // Get frontmatter and route

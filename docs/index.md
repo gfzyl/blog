@@ -49,6 +49,9 @@ lastUpdated: true
   </div>  
 </div>
 
+## 背诵记录📅
+
+<ActivityCalendar />
 
 
 ## 本站内容🆕
