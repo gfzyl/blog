@@ -12,6 +12,9 @@ const vitepressSidebarOptions = {
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+    optimizeDeps: {
+        include: ['vue-activity-calendar']
+    },
     //网站部署的路径，默认根目录
     base: '/blog',
     title: "York-经典鸡粉",

@@ -22,7 +22,8 @@ import {useData, useRoute} from 'vitepress';
 // BackToTop
 import BackToTop from './components/BackToTop.vue'
 // ActivityCalendar
-import {ActivityCalendar} from "vue-activity-calendar";
+import VueActivityCalendar from 'vue-activity-calendar';
+const { ActivityCalendar } = VueActivityCalendar;
 //同时引入css文件，确保基本样式可用
 import "vue-activity-calendar/style.css";
 // 打卡
