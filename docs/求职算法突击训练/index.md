@@ -17,6 +17,8 @@
 | 动态规划 | <img src="https://img.shields.io/badge/动态规划-gold" style="zoom:150%;" /> |
 |  二分法  | <img src="https://img.shields.io/badge/二分-orange" style="zoom:150%;" /> |
 | 滑动窗口 | <img src="https://img.shields.io/badge/滑动窗口-teal" style="zoom:150%;" /> |
+|   分治   | <img src="https://img.shields.io/badge/分治-darkblue" style="zoom:150%;" /> |
+|  二叉树  | <img src="https://img.shields.io/badge/二叉树-lightgreen" style="zoom:150%;" /> |
 
 重要程度:
 
