@@ -6,6 +6,8 @@
 
 ![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E9%B8%A1%E7%BF%85.jpg)
 
+说明: 角色 `role` 就是 一组权限 `permission` 的集合, 所以权限构成了角色, 每个用户可以有多个角色, 每种角色又有多个权限,都是多对多的关系
+
 ![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E9%B8%A1%E7%BF%85%E6%95%B0%E6%8D%AE%E8%A1%A82.jpg)
 
 ![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E9%B8%A1%E7%BF%85%E6%95%B0%E6%8D%AE%E8%A1%A83.jpg)
@@ -114,8 +116,31 @@ apipost，进行团队的协作。
 
 题目会分为四个类型：单选、多选、判断和简答。在 **题型这块实践过程中扩展为工厂+策略的设计模式** 来做，这样做即使题型扩展，原先编写的代码也不需要修改。
 
-为了方便查询题目，特别对题目做了 **分类和标签** 处理。其中分类表示大类，比如框架、数据库等等；而标签则对应更细的类型，一个题目可以属于多个标签，比如一道
-mysql 的题目，既可以属于 mysql 标签，也可以属于基础标签，这就可以做难度的划分。除此之外，还有题目的解析。
+为了方便查询题目，特别对题目做了 **分类和标签** 处理。其中分类表示大类，比如框架、数据库等等；而标签则对应更细的类型，一个题目可以属于多个标签，比如一道mysql 的题目，既可以属于 mysql 标签，也可以属于基础标签，这就可以做难度的划分。除此之外，还有题目的解析。
+
+------
+
+::: warning
+
+这里为了 **防止给面试官解释不清楚分类和标签的设计**, 具体解释如下
+
+分类有两个级别, 父级和子级之间靠 `parent_id` 这个字段关联( `parent_id` 为 `0` 表示父级, 否则表示对应以 `id` 为父级的子级)。
+
+然后父级代表的就是 **岗位**, 好比 后端呀, 前端呀, 测试呀
+
+子级代表的就是 **某个岗位里面涉及到的某些具体技术**，拿后端来说，这里的子级就可以是缓存呀，数据库呀，框架呀，消息队列什么的
+
+接下来说标签，标签只和子级产生关系，**它能对应于某个技术里面更加精细的部分**，就比如，对于缓存这个子级，可能会有的标签比如 `Redis` 啊，事务啊，集群啊，分布式啊，数据一致性啊这样 **更加精细的点**
+
+子级下面可以有多个标签，某个标签也可以对应于多个子级，就好比 **事务**，它可以对应在缓存中，也可以对应在数据库中
+
+以图片为例
+
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E5%88%86%E7%B1%BB%E5%92%8C%E6%A0%87%E7%AD%BE%E7%9A%84%E8%AE%BE%E8%AE%A1.jpg)
+
+:::
+
+------
 
 为了方便精准查找，做了全文检索的高亮设计。
 
@@ -300,6 +325,29 @@ nacos 主要是 **长轮询** 的方式获取数据，client 也就是我们的�
 
 Role（角色）就是一组权限的集合。核心思想就是把 **角色** 和 **权限** 做关联，实现整体灵活访问，提高系统的安全性和管理性。
 
+::: danger
+
+参考: https://sa-token.cc/doc.html#/use/jur-auth
+
+网关统一鉴权
+
+校验权限, 校验用户的角色等等的东西, 我们就放在网关里面统一去做
+
+不放在网关, 导致我们的每个微服务, 全都要引入鉴权的框架和逻辑, 不断地重复代码逻辑
+
+但同时就引来了数据的权限获取问题:
+
+1. 网关直接对接数据库, 从数据库中查询权限
+
+2. Redis 中获取数据, 获取不到的时候再去数据库查
+
+3. Redis 中获取缓存, 获取不到从 auth 服务里面获取相关的信息(✅)
+   auth服务就是一个非常原子性的服务, 权限相关的基操(就是实际的和数据库之间有关权限的几张表的CRUD都在这个微服务里)在这个服务中
+
+   **关于鉴权总结就是 :先从Redis中获取缓存数据，获取不到时走RPC调用子服务 (专门的权限数据提供服务) 获取**, 可见 `auth` 模块的作用是专门提供权限数据
+
+:::
+
 ## 18. 权限数据你是放到了哪里？redis 吗？
 
 <img src="https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/1707878867889-2fd212f5-4932-49c6-8361-1568dbec3755.png" alt="img" style="zoom:67%;" />
@@ -341,12 +389,47 @@ Cookie 这一功能的。
 
 ## 21. gateway 网关你是怎么设计的？![](https://img.shields.io/badge/重要-red)
 
-gateway 网关，作为项目的整个流量入口，目前主要实现了路由，负载，统一鉴权，全局过滤器，异常处理这些功能。
+参考: https://sa-token.cc/doc.html#/micro/gateway-auth
+
+gateway 网关，作为项目的整个流量入口，目前主要实现了路由，负载，**统一鉴权**，全局过滤器，异常处理这些功能。
 
 路由和负载承载了后台微服务的 uri 转发和前缀匹配。
 
-统一鉴权主要是配合 satoken，**在 gateway 集成 redis，同时实现 satoken 提供的权限读取接口**
-，在其中自定义读取逻辑，实现鉴权的校验。还实现了登录拦截器，用于传递 loginId 到微服务中，借助了 header 的传递。
+统一鉴权主要是配合 satoken，**在 gateway 集成 redis，同时实现 satoken 提供的权限读取接口**，在其中自定义读取逻辑，实现 **鉴权** 的校验(网关在redis里面读取权限鉴权)。
+
+**关于鉴权总结就是 :先从Redis中获取缓存数据，获取不到时走RPC调用子服务 (专门的权限数据提供服务) 获取**
+
+还实现了登录拦截器，用于传递 loginId 到微服务中，借助了 header 的传递。
+
+```yml
+gateway:
+  routes:
+    - id: oss
+      uri: lb://jc-club-oss
+      # 断言
+      predicates:
+        - Path=/oss/**
+      # 隐藏路径的一种方式，比如访问oss时要写成 /oss/jc-club-oss/getAllBucket才行
+      # 按照下面的配置 /oss/getAllBucket这样就可以访问
+      filters:
+        - StripPrefix=1
+    - id: subject
+      uri: lb://jc-club-subject
+      predicates:
+        - Path=/subject/**
+      filters:
+        - StripPrefix=1
+    - id: auth
+      uri: lb://jc-club-auth
+      predicates:
+        - Path=/auth/**
+      filters:
+        - StripPrefix=1
+```
+
+上面的 `lb://` 表示使用负载均衡, 后面的 `jc-club-subject`  其实就是这个服务集群的各个ip (用了lb就必须引入负载均衡的依赖)
+
+`      filters: StripPrefix=1` 是隐藏路径的一种方式，比如访问oss时要写成 /oss/jc-club-oss/getAllBucket才行, 按照下面的配置 /oss/getAllBucket这样就可以访问
 
 ## 22. 分布式会话的鉴权在微服务中的是怎么做的？![](https://img.shields.io/badge/重要-red)
 
@@ -444,7 +527,142 @@ token，之后所有的请求都会带着这个 token， 所有的请求都根�
 
 于是将逻辑进行后移，将 **分类换成多线程并发获取**，然后统一进行组装，再返回给前端,提高了性能。
 
-主要用到了 **futuretask** 来进行实现，同时 **自定义线程池**，而不是使用 jdk 提供的默认线程池。
+主要用到了 **`futuretask`** 和  **`CompletableFuture`（主要）** 和来进行实现，同时 **自定义线程池**，而不是使用 jdk 提供的默认线程池。
+
+------
+
+::: danger
+
+为了防止这些话看不懂给面试官解释不清楚，我们对上面的话进行一波改版
+
+（前提：翻到最上面看我写的具体设计，把这个设计先给面试官说清楚）
+
+依据我们的设计，每个岗位下都有一系列二级分类（这里就称为 **技术**），每个 **技术** 下面又有各自的一系列标签
+
+点击一个岗位肯定要先查询到这个岗位下面的技术有哪些，这个是 **前置** 也是必须的，接着对于标签就是根据这些技术来查，怎么查就是下面的关键啦~
+
+原先我们的设计没有引入多线程，这意味着当用户从前端刚进入页面的时候，此时展示一个默认岗位下面的信息，那么这个默认岗位下面的一系列 **技术** 对应的标签就需要用 **轮询** 的方法，即一个技术一个技术的去查到对应的标签信息最后全部展示出来。**简单来说，查询的时候某个时刻只能查到一个技术下面的标签**
+
+引入多线程以后（而且是池化技术，线程复用减少了上下文切换），对于一个岗位下面的多个技术来说，在线程池里启动线程，**每个线程负责查询一个技术下面的标签**，最后根据 `CompletableFuture` 的特性，**异步** 地 **组装** 这些线程各自获得的结果最后展示出来。 **简单来说，查询的时候某个时刻可以查到多个技术下面的标签**
+
+如果是用 `FutureTask`， 可以结合 `CountDownLatch`（其实就是个倒数计时器，因为异步任务你不知道什么时候他就执行完了，总不能每次都特别等一段长点儿的时间然后返回结果，这样太蠢了，对与我们这里的场景来说，用 `CountDownLatch` 的话就可以初始化为 **技术的个数**， 那么等待这个计数器消耗完毕，也就是所有技术都查询完了以后再获取结果就ok了）
+
+主流的话是用 `CompletableFuture`
+
+**时间相关**：原本的需要200-300ms，多线程可以优化到 40-70ms，
+
+:::
+
+下面是优化前进入前端，这个时候请求还在查询，需要好一会儿才会出来
+
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E5%85%B3%E4%BA%8E%E5%88%86%E7%B1%BB%E5%92%8C%E6%A0%87%E4%BC%98%E5%8C%96%E5%89%8D-%E7%AD%BE%E5%89%8D%E7%AB%AF%E7%9A%84%E5%93%8D%E5%BA%94%E6%83%85%E5%86%B5.jpg)
+
+------
+
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E5%88%86%E7%B1%BB%E5%AD%90%E5%88%86%E7%B1%BB%E6%A0%87%E7%AD%BE.png)
+
+```java
+/**
+     * 查询分类下标签-一次性
+     *
+     * @param subjectCategoryBO
+     * @return
+     */
+@SneakyThrows
+@Override
+public List<SubjectCategoryBO> queryCategoryAndLabel(SubjectCategoryBO subjectCategoryBO) {
+    Long id = subjectCategoryBO.getId();
+    String cacheKey = "categoryAndLabel." + subjectCategoryBO.getId();
+    List<SubjectCategoryBO> subjectCategoryBOS = cacheUtil.getResult(cacheKey,
+                                                                     SubjectCategoryBO.class, (key) -> getSubjectCategoryBOS(id));
+    return subjectCategoryBOS;
+}
+
+private List<SubjectCategoryBO> getSubjectCategoryBOS(Long categoryId) {
+    SubjectCategory subjectCategory = new SubjectCategory();
+    subjectCategory.setParentId(categoryId);
+    subjectCategory.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
+    List<SubjectCategory> subjectCategoryList = subjectCategoryService.queryCategory(subjectCategory);
+    if (log.isInfoEnabled()) {
+        log.info("SubjectCategoryController.queryCategoryAndLabel.subjectCategoryList:{}",
+                 JSON.toJSONString(subjectCategoryList));
+    }
+    List<SubjectCategoryBO> categoryBOList = SubjectCategoryConverter.INSTANCE.convertBoToCategory(subjectCategoryList);
+    Map<Long, List<SubjectLabelBO>> map = new HashMap<>();
+    List<CompletableFuture<Map<Long, List<SubjectLabelBO>>>> completableFutureList =
+        categoryBOList.stream()
+        .map(category -> CompletableFuture.supplyAsync(() -> getLabelBOList(category), labelThreadPool)) // [!code highlight]
+        .collect(Collectors.toList());
+    completableFutureList.forEach(future -> {
+        try {
+            Map<Long, List<SubjectLabelBO>> resultMap = future.get();
+            if (!MapUtils.isEmpty(resultMap)) {
+                map.putAll(resultMap);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    });
+    categoryBOList.forEach(categoryBO -> {
+        if (!CollectionUtils.isEmpty(map.get(categoryBO.getId()))) {
+            categoryBO.setLabelBOList(map.get(categoryBO.getId()));
+        }
+    });
+    return categoryBOList;
+}
+
+private Map<Long, List<SubjectLabelBO>> getLabelBOList(SubjectCategoryBO category) {
+    if (log.isInfoEnabled()) {
+        log.info("getLabelBOList:{}", JSON.toJSONString(category));
+    }
+    Map<Long, List<SubjectLabelBO>> labelMap = new HashMap<>();
+    SubjectMapping subjectMapping = new SubjectMapping();
+    subjectMapping.setCategoryId(category.getId());
+    List<SubjectMapping> mappingList = subjectMappingService.queryLabelId(subjectMapping);
+    if (CollectionUtils.isEmpty(mappingList)) {
+        return null;
+    }
+    List<Long> labelIdList = mappingList.stream().map(SubjectMapping::getLabelId).collect(Collectors.toList());
+    List<SubjectLabel> labelList = subjectLabelService.batchQueryById(labelIdList);
+    List<SubjectLabelBO> labelBOList = new LinkedList<>();
+    labelList.forEach(label -> {
+        SubjectLabelBO subjectLabelBO = new SubjectLabelBO();
+        subjectLabelBO.setId(label.getId());
+        subjectLabelBO.setLabelName(label.getLabelName());
+        subjectLabelBO.setCategoryId(label.getCategoryId());
+        subjectLabelBO.setSortNum(label.getSortNum());
+        labelBOList.add(subjectLabelBO);
+    });
+    labelMap.put(category.getId(), labelBOList);
+    return labelMap;
+}
+```
+
+这段代码的主要功能是查询分类及其下的标签。具体流程如下：
+
+1. **`queryCategoryAndLabel` 方法：**
+   - 该方法是查询分类及其标签的入口。
+   - 首先从 `SubjectCategoryBO` 中获取分类的 `id`，并生成缓存键 `cacheKey`。
+   - 使用 `cacheUtil.getResult` 从缓存中查询分类及其标签信息，如果缓存中没有，则通过回调 `getSubjectCategoryBOS(id)` 获取数据。
+
+2. **`getSubjectCategoryBOS` 方法：**
+   - 该方法用于根据分类 ID 查询该分类及其下的标签信息。
+   - 首先构造一个 `SubjectCategory` 对象，用于查询所有属于该分类的子分类，并过滤掉已删除的分类。
+   - 查询结果后，将其转换为 `SubjectCategoryBO` 对象的列表。
+   - 然后，使用 `CompletableFuture` 异步查询每个分类下的标签信息。每个分类下的标签查询操作在 `getLabelBOList` 方法中执行，并在一个独立的线程池 `labelThreadPool` 中进行。
+   - 所有的标签查询结果存放在 `map` 中，最后将标签信息与对应的分类绑定起来。
+
+3. **`getLabelBOList` 方法：**
+   - 该方法负责为给定的分类查询其关联的标签。
+   - 通过 `SubjectMapping` 对象查询该分类下的标签 ID 列表。
+   - 如果找到标签 ID，则通过 `subjectLabelService.batchQueryById` 批量查询标签信息，并将其转换为 `SubjectLabelBO` 对象列表，最后将标签信息放入 `labelMap` 中。
+
+### 关键流程总结：
+1. **从缓存中获取分类和标签信息**，若不存在，则进行数据库查询。
+2. **异步处理标签查询**：为每个分类异步查询标签，提升查询效率。
+3. **结果合并**：将查询到的标签绑定到相应的分类对象中。
+
+代码的总体目的是通过分类 ID，查询该分类及其下的子分类，并为每个分类获取其对应的标签列表，最终返回分类与标签的完整数据结构。
 
 ## 30. 自定义线程工厂的意义是什么？![](https://img.shields.io/badge/重要-red)
 
@@ -455,6 +673,7 @@ token，之后所有的请求都会带着这个 token， 所有的请求都根�
 * 可以设置守护线程。
 * 可以设置 **线程优先级**
 * 可以处理未捕获的异常：在执行一个任务时，线程可能会由于未捕获的异常而终止，默认处理是将异常打印到控制台。但这种处理方式有时并非你所想要的，存放如文件或者db会更合适。
+* 拒绝策略优先选择`CallerRunsPolicy`，即调用者执行，在线程池中不足以处理的时候交给调用者来执行
 
 ## 31.线程池的数量应该设置多少
 
@@ -502,11 +721,360 @@ token，之后所有的请求都会带着这个 token， 所有的请求都根�
 
 :::
 
+链路流程：
+
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E9%93%BE%E8%B7%AF%E6%B5%81%E7%A8%8B.jpg)
+
+详细设计：
+
 <img src="https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/1707884371208-a9f8d49a-0fe0-477b-afb9-f08db05f5b35.png" alt="img" style="zoom:50%;" />
 
 当用户的请求来临的时候，前端会带着 token，token 里面有用户的 loginId 信息，首先经过网关的全局拦截器，拦截器会帮我们放入
 header 里面，传递到其他微服务，微服务自己又实现了拦截器，获取到之后，放入上下文对象中，如果是微服务之间的 feign 调用，则又实现了
-feign 的拦截器交互。
+feign 的拦截器交互。然后提供了全局的 `Util` 操作，只要应用这个工具类，就可以随时获得用户信息
+
+------
+
+### 细节：
+
+1. #### 网关层面的全局拦截器 `LoginFilter`<img src="https://img.shields.io/badge/重要-red" style="zoom:150%;" />
+
+   这个是开头，所有的请求都要先打到网关，在网关中把信息放到Header中去
+
+   ```java
+   /**
+    * 网关全局过滤器，把除了登录以外的请求从token中获取loginId放入header中
+    *
+    * @author York
+    * @className LoginFilter
+    * @date 2024/09/17 16:44
+    * @description
+    */
+   @Component
+   @Slf4j
+   public class LoginFilter implements GlobalFilter {
+   
+       @Override
+       @SneakyThrows
+       public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+           ServerHttpRequest request = exchange.getRequest();
+           ServerHttpResponse response = exchange.getResponse();
+           ServerHttpRequest.Builder mutate = request.mutate();
+           String url = request.getURI().getPath();
+           log.info("LoginFilter.filter.url:{}", url);
+           if (url.equals("/user/doLogin")) {
+               return chain.filter(exchange);
+           }
+           SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+           log.info("LoginFilter.filter.url:{}", new Gson().toJson(tokenInfo));
+           String loginId = (String) tokenInfo.getLoginId();
+           mutate.header("loginId", loginId);
+           return chain.filter(exchange.mutate().request(mutate.build()).build());
+       }
+   }
+   ```
+
+2. #### 对于每个微服务我们都要做如下的设置<img src="https://img.shields.io/badge/重要-red" style="zoom:150%;" />
+
+   由网关分发过来的对每个微服务的调用请求，都经过拦截器的处理，把header中的信息添加到上下文对象中（每个微服务都要这样）
+
+   从网关发来的请求经过 **登录拦截器 `LoginInterceptor` **，从 **Header** 中获取 `loginId` 并把它存到上下文对象 `LoginContextHolder` 中
+
+   这里的上下文对象就是根据 `InheritableThreadLocal` 实现的，他可以实现子线程继承父线程的本地变量，也能解决多线程复用带来的一些问题
+
+   ```java
+   /**
+    * 登录拦截器
+    * 除了登录以外的所有请求经过网关的LoginFilter以后，Header中就已经带上了loginId这个信息
+    * 但是微服务之间各种调用需要用上下文对象，把这个loginId存到这个上下文对象，做法是结合threadlocal
+    */
+   public class LoginInterceptor implements HandlerInterceptor {
+   
+       private static final String LOGIN_ID = "loginId";
+   
+       @Override
+       public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+           String loginId = request.getHeader(LOGIN_ID);
+           if (StringUtils.isNotBlank(loginId)) {
+               // 将loginId存入到上下文对象中
+               LoginContextHolder.set(LOGIN_ID, loginId);
+           }
+           return true;
+       }
+       
+       // [!code focus:7]
+       // 将上下文对象清除，这是threadlocal使用的一个非常要注意的点，否则由于线程复用会造成数据问题
+       @Override
+       public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception {
+           LoginContextHolder.remove();
+       }
+   }
+   ```
+
+3. #### 补充上述我们的上下文对象
+
+   ```java
+   /**
+    * 登录上下文对象
+    */
+   public class LoginContextHolder {
+   
+       private static final InheritableThreadLocal<Map<String, Object>> THREAD_LOCAL
+           = new InheritableThreadLocal<>();
+   
+       public static void set(String key, Object val) {
+           Map<String, Object> map = getThreadLocalMap();
+           map.put(key, val);
+       }
+   
+       public static Object get(String key) {
+           Map<String, Object> threadLocalMap = getThreadLocalMap();
+           return threadLocalMap.get(key);
+       }
+   
+       public static String getLoginId() {
+           return (String) getThreadLocalMap().get("loginId");
+       }
+   
+       public static void remove() {
+           THREAD_LOCAL.remove();
+       }
+   
+       public static Map<String, Object> getThreadLocalMap() {
+           Map<String, Object> map = THREAD_LOCAL.get();
+           if (Objects.isNull(map)) {
+               map = new ConcurrentHashMap<>();
+               THREAD_LOCAL.set(map);
+           }
+           return map;
+       }
+   }
+   ```
+
+4. #### 将登录拦截器 `LoginInterceptor` 注册到 MVC 的全局拦截器中，这样才会生效
+
+   ```java
+   /**
+    * mvc的全局处理
+    * 为了解决SpringMVC出现的问题，比如那个disable SerializationFeature.FAIL_ON_EMPTY_BEANS
+    */
+   @Configuration
+   public class GlobalConfig extends WebMvcConfigurationSupport {
+   
+       /**
+        * 全局配置
+        *
+        * @param converters
+        */
+       @Override
+       protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+           super.configureMessageConverters(converters);
+           converters.add(mappingJackson2HttpMessageConverter());
+       }
+   	
+       // [!code focus:7]
+       @Override
+       protected void addInterceptors(InterceptorRegistry registry) {
+           registry.addInterceptor(new LoginInterceptor())
+               .addPathPatterns("/**")
+               .excludePathPatterns("/user/doLogin");
+       }
+   
+       private MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
+           ObjectMapper objectMapper = new ObjectMapper();
+           objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+           // 需求：后端返回的东西如果是null就不返回给前端了
+           objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+           MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter(objectMapper);
+           return converter;
+       }
+   }
+   ```
+
+5. 创建一个工具类 `LoginUtil` 及时获取 `loginId`
+
+   直接从上下文对象中获取即可
+
+   ```java
+   public class LoginUtil {
+   
+       public static String getLoginId() {
+           return LoginContextHolder.getLoginId();
+       }
+   }
+   ```
+
+------
+
+#### 关于RPC调用
+
+这样上下文就打通了？不！对于 `RPC`（这里我们用的是Feign的调用方式，我们发现，Feign调用的时候之前封装的信息会丢失，就是比如A服务要调用B服务，请求正常打到A服务到A服务调用B服务之前这个信息我们一直都是能拿到的，但是A服务调用B服务的时候，这个信息就丢失了，这个就是我们要探讨的地方）
+
+==关于这点，可以看我的【技术分享】专栏里面，关于微服务调用这里的看到的博客==
+
+看一下Feign调用的源码执行，可以看到主要是 *构建了一个新的RequestTemplate ，之前处理的Header加入的信息就都没了*
+
+```java
+//1.在远程调用的方法上打个断点
+List<MemberAddressVo> address = memberFeignService.getAddress(memberRespVo.getId());
+
+//2.进入方法内部 ReflectiveFeign.class
+public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    //判断调用是不是equal方法
+    if (!"equals".equals(method.getName())) {
+        //判断是不是调用hashCode
+        if ("hashCode".equals(method.getName())) {
+            return this.hashCode();
+        } else {
+            //判断是不是调用toString 都不是就执行  ((MethodHandler)this.dispatch.get(method)).invoke(args);
+            return "toString".equals(method.getName()) ? this.toString() : ((MethodHandler)this.dispatch.get(method)).invoke(args);
+        }
+    } else {
+        try {
+            Object otherHandler = args.length > 0 && args[0] != null ? Proxy.getInvocationHandler(args[0]) : null;
+            return this.equals(otherHandler);
+        } catch (IllegalArgumentException var5) {
+            return false;
+        }
+    }
+}
+
+//3. ((MethodHandler)this.dispatch.get(method)).invoke(args); 
+//点击进入invoke 方法  SynchronousMethodHandler.class
+public Object invoke(Object[] argv) throws Throwable {
+    // [!code focus:4]
+    //就是在这 构建了一个新的RequestTemplate ，之前处理的Header加入的信息就都没了
+    RequestTemplate template = this.buildTemplateFromArgs.create(argv);
+    Retryer retryer = this.retryer.clone();
+
+    while(true) {
+        try {
+            //在这即将执行该方法
+            return this.executeAndDecode(template);
+        } catch (RetryableException var8) {
+            RetryableException e = var8;
+
+            try {
+                retryer.continueOrPropagate(e);
+            } catch (RetryableException var7) {
+                Throwable cause = var7.getCause();
+                if (this.propagationPolicy == ExceptionPropagationPolicy.UNWRAP && cause != null) {
+                    throw cause;
+                }
+
+                throw var7;
+            }
+
+            if (this.logLevel != Level.NONE) {
+                this.logger.logRetry(this.metadata.configKey(), this.logLevel);
+            }
+        }
+    }
+}
+```
+
+深入查看 `executeAndDecode方法` 原因：
+
+```java
+Object executeAndDecode(RequestTemplate template) throws Throwable {
+    // [!code focus:3]
+    //这里 它会对我们的请求进行一些包装 
+    Request request = this.targetRequest(template);
+    
+    if (this.logLevel != Level.NONE) {
+        this.logger.logRequest(this.metadata.configKey(), this.logLevel, request);
+    }
+
+    long start = System.nanoTime();
+
+    Response response;
+    try {
+        response = this.client.execute(request, this.options);
+    } catch (IOException var15) {
+        if (this.logLevel != Level.NONE) {
+            this.logger.logIOException(this.metadata.configKey(), this.logLevel, var15, this.elapsedTime(start));
+        }
+
+        throw FeignException.errorExecuting(request, var15);
+    }
+
+    // [!code focus:14]
+    //下面我们查看一下targetRequest方法
+    Request targetRequest(RequestTemplate template) {
+        //拿到对应的所有请求拦截器的迭代器
+        Iterator var2 = this.requestInterceptors.iterator();
+
+        //遍历所有的请求拦截器
+        while(var2.hasNext()) {
+            RequestInterceptor interceptor = (RequestInterceptor)var2.next();
+            //这里是每个请求拦截器 依次对该方法进行包装
+            interceptor.apply(template);
+        }
+        return this.target.apply(template);
+    }
+
+
+    //我们发现它是一个接口 所以可以重写一下这个方法 对我们的请求做一些包装 借鉴一下别的实现方法
+    public interface RequestInterceptor {
+        void apply(RequestTemplate var1);
+    }
+
+    public class BasicAuthRequestInterceptor implements RequestInterceptor {
+        public void apply(RequestTemplate template) {
+            template.header("Authorization", new String[]{this.headerValue});
+        }
+    }
+```
+
+**所以我们要做的就是自主的添加这么一个 `RequestInterceptor`**
+
+```java
+/**
+ * Feign请求拦截器
+ * 我们发现，使用微服务RPC调用时（我们这里是用Feign的方式）
+ * 根据之前的MVC全局拦截器，从网关一开始打来的请求Header中已经加入了loginId这个信息
+ * 但是用Feign调用的时候，这个信息却丢失了（扩展：还要注意一点是Feign的重置有三次）
+ * 根据Feign调用的源码执行，会构建一个新的RequestTemplate，之前处理的Header加入的信息就都没了
+ */
+@Component
+public class FeignRequestInterceptor implements RequestInterceptor {
+
+    private static final String LOGIN_ID = "loginId";
+
+    @Override
+    public void apply(RequestTemplate requestTemplate) {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = requestAttributes.getRequest();
+        if (Objects.nonNull(request)) {
+            String loginId = request.getHeader(LOGIN_ID);
+            if (StringUtils.isNotBlank(loginId)) {
+                requestTemplate.header(LOGIN_ID, loginId);
+            }
+        }
+    }
+}
+```
+
+然后把这个拦截器注入到配置中即可
+
+```java
+/**
+ * openFeign的配置类
+ * 这里加入了我们自定义的拦截器FeignRequestInterceptor
+ * 作用是为了让RPC调用时也能拿到user的loginId，也就是username
+ */
+@Configuration
+public class FeignConfiguration {
+
+    @Bean
+    public RequestInterceptor requestInterceptor(){
+        return new FeignRequestInterceptor();
+    }
+
+}
+```
+
+到此，所有的上下文才算完全打通
 
 ## 33. 微服务之间的数据交互是如何做的？
 
@@ -585,3 +1153,149 @@ xxljob，xxljob 的调度十分完善，故障转移，负载均衡算法选择�
 3、面试官，通过这场面试，您觉得我应该在哪些方面进行继续的努力？
 
 4、面试官，我觉得我十分想加入咱们公司，有哪些东西是我可以提前准备准备的？（ps 这个问题，hr 面，或者终面，觉得效果不错再问）
+
+
+
+------
+
+# 补充
+
+## 1. “采取**适配器模式**实现oss对接”是怎么做的
+
+首先这个做法的场景是希望切换不同的OSS服务时不需要改动任何业务代码, 而只在 Nacos 中指定想要的 OSS 服务的 type,  依据Nacos 结合 `@RefreshScope注解` 动态的刷新配置, 即读取指定的 type 然后修改为相应的适配器, 具体做法如下:
+
+首先对不同的 OSS 服务的主要功能 抽取出一个公共的接口即 `Adapter`, 这里以 `MinIO` 为例。写一个配置类 `MinIOConfig` 先来读取 `yml` 中关于 `MinIO` 必要的配置信息, 比如 `url`, `accessKey`, `secretKey`, 接着根据 `MinIO` 提供的 `MinIOClient` 进一步封装其中的操作为一个工具类 `MinIOUtil`,  接着就可以专门为 `MinIO` 实现上述的适配器, 只需要注入刚刚封装好的工具类即可实现.这时一个可用的适配器就做好了
+
+接着, 为了在 `Controller` 中透明的提供 `OSS` 的服务, 于是对适配器做一个包装, 创建一个配置类专门动态的读取和刷新 `OSS` 服务的 `type`, 根据不同的类型返回一个相应的适配器对象, 但统一都名为 `storageAdapter`, 即最上面提到的适配器类型。最后,  创建一个 `FileService`, 用 `构造器注入Bean` 的方法注入这个适配器的实现对象, 就可以实现 根据类型注入对应的适配器对象, 这样就可以用了
+
+```java
+private final StorageAdapter storageAdapter;
+
+public FileService(StorageAdapter storageAdapter) {
+    this.storageAdapter = storageAdapter;
+}
+```
+
+------
+
+**简单记忆**:
+
+为实现适配器模式对接OSS并动态切换服务，首先定义一个公共接口 `StorageAdapter`，抽象出不同OSS服务的核心功能。以MinIO为例，编写 `MinIOConfig` 读取配置，并通过 `MinIOClient` 封装为工具类 `MinIOUtil`，再实现MinIO的适配器。接着，通过配置类动态读取Nacos中的OSS服务类型，结合 `@RefreshScope` 实现配置刷新，返回相应适配器实例，统一命名为 `storageAdapter`。最后，在 `FileService` 中通过构造函数注入 `storageAdapter`，实现动态注入对应的适配器，确保业务代码无需修改。
+
+## 2. “Gateway 网关实现全局异常处理” 怎么实现的
+
+```java
+/**
+ * 网关实现全局异常处理
+ */
+@Component
+public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
+
+    private ObjectMapper objectMapper = new ObjectMapper();
+
+
+    @Override
+    public Mono<Void> handle(ServerWebExchange serverWebExchange, Throwable throwable) {
+        ServerHttpRequest request = serverWebExchange.getRequest();
+        ServerHttpResponse response = serverWebExchange.getResponse();
+        Integer code = 200;
+        String message = "";
+        if (throwable instanceof SaTokenException) {
+            code = 401;
+            message = "用户无权限";
+            throwable.printStackTrace();
+        } else {
+            code = 500;
+            message = "系统繁忙";
+            throwable.printStackTrace();
+        }
+        Result result = Result.fail(code, message);
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+        return response.writeWith(Mono.fromSupplier(() -> {
+            DataBufferFactory dataBufferFactory = response.bufferFactory();
+            byte[] bytes = null;
+            try {
+                bytes = objectMapper.writeValueAsBytes(result);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            return dataBufferFactory.wrap(bytes);
+        }));
+    }
+}
+```
+
+实现 `ErrorWebExceptionHandler` 接口, 重写 `handle` 方法, 其中的 `serverWebExchange` 就包含了本次请求中的 `request` 和 `response` 等信息, 主要利用这两个就可以根据 `throwable` 异常信息做出相应的反馈
+
+## 3. 缓存与数据一致性问题
+
+==**当我们选择了完全信任缓存的时候，以下不需要考虑**==
+
+一般的流程是，先查缓存，缓存没有的话查数据库，查到数据库的信息在返回之前将这条信息放入缓存中去。但是这样在并发环境下会有数据不一致的问题
+
+### 一种方法是先删除缓存，再更新数据库
+
+这种方法有一定的使用量，即使数据库更新失败，缓存也会刷，确保了缓存和数据的一致性
+
+但是这种方法==**在高并发下**==，
+
+比如有A\B两个线程，按照先删除缓存再更新数据库的操作，A线程把缓存中的数据删了正在更新数据库，此时B线程发现缓存没有数据于是去查询数据库，这时数据库的信息还没有更新完毕已经查到了，==这就是脏数据==，把这个脏数据又插入到了缓存中去，于是出现了问题
+
+### 比较好的推荐方法——延迟双删
+
+对于以上比较好的解决方法：
+
+就是更新完数据库以后（这里隐含了一次更新前删除缓存、并在更新完以后将最新的数据插入到缓存中的操作），这时再删一次缓存，于是再查一次数据库将最新的数据放入到缓存中去（这就是删两次）
+
+### 扩展思路
+
+1. 消息队列补偿
+
+   删除失败的缓存，作为消息打入mq，mq消费者进行监听，再次进行重试刷缓存
+
+2. canal
+
+   监听数据库的变化，做一个公共服务，专门对接缓存刷新。优点是业务解耦，否则的话业务太多冗余代码复杂度
+
+## 4. 把这几种常用的MP的实例好好记一记 老忘
+
+```xml
+<select id="listUserInfoByIds" resultType="com.york.auth.infra.basic.entity.AuthUser">
+    select
+    id, user_name, nick_name, email, phone, password, sex, avatar, status, introduce, ext_json, created_by,
+    created_time, update_by, update_time, is_deleted
+    from auth_user
+    where user_name in
+    <foreach collection="userNameList" index="index" item="item" open="(" separator="," close=")">
+        #{item}
+    </foreach>
+</select>
+
+<!--新增所有列，用selectKey返回本次插入后的id-->
+<insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
+        SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into auth_user(user_name, nick_name, email, phone, password, sex, avatar, status, introduce, ext_json,
+    created_by, created_time, update_by, update_time, is_deleted)
+    values (#{userName}, #{nickName}, #{email}, #{phone}, #{password}, #{sex}, #{avatar}, #{status}, #{introduce},
+    #{extJson}, #{createdBy}, #{createdTime}, #{updateBy}, #{updateTime}, #{isDeleted})
+</insert>
+```
+
+## 5. 如何优雅的关闭线程池
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
