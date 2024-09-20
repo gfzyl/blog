@@ -1108,8 +1108,73 @@ auth 微服务的 jar 包即可。开启 **feignclient** 指定好应用名，�
 
 ## 34. 本地缓存在哪里使用的？![](https://img.shields.io/badge/中等-orange)
 
-本地缓存在项目中是在 **分类和标签查询** 使用的，<u>分类和标签的数据很少产生变更，加个缓存速度更快</u>，其实从实际的角度，其实直接用
-redis 作为缓存就可以适合这个场景了。但是可以去额外了解 **本地缓存 Guava 的使用**，于是引入了本地缓存。并且基于此配合函数式编程封装了一个公共缓存工具类。
+本地缓存在项目中是在 **分类和标签查询** 使用的，<u>分类和标签的数据很少产生变更，加个缓存速度更快</u>，其实从实际的角度，其实直接用redis 作为缓存就可以适合这个场景了。但是可以去额外了解 **本地缓存 Guava 的使用**，于是引入了本地缓存。并且基于此配合函数式编程封装了一个公共缓存工具类。
+
+```java
+@SneakyThrows
+@Override
+public List<SubjectCategoryBO> queryCategoryAndLabel(SubjectCategoryBO subjectCategoryBO) {
+    Long id = subjectCategoryBO.getId();
+    String cacheKey = "categoryAndLabel." + subjectCategoryBO.getId();
+    List<SubjectCategoryBO> subjectCategoryBOS = cacheUtil.getResult(cacheKey,
+                                                                     SubjectCategoryBO.class, (key) -> getSubjectCategoryBOS(id));
+    return subjectCategoryBOS;
+}
+```
+
+封装的工具类如下
+
+```java
+@Component
+public class CacheUtil<K, V> {
+
+    private Cache<String, String> localCache =
+        CacheBuilder.newBuilder()
+        .maximumSize(5000)
+        .expireAfterWrite(10, TimeUnit.SECONDS)
+        .build();
+
+
+    /**
+     * 非常值得学习的思路
+     * 首先它是用本地缓存的，cacheKey就是缓存的key
+     * 这里用了泛型K，V（主要是用V，K的话可以用下面的map的逻辑，我们主要学习这个V的逻辑就好）
+     * Function<String, List<V>> function就是我们的函数式接口，它的作用就是传入一个String，返回一个List<V>
+     * 对于缓存，我们的key是String，但是value类型不一定
+     * 所以我们用V这个泛型接受Class对象，使得下面的序列化知道要反序列化成什么类型的对象
+     * 至于函数式接口，这个点就是要学习的一部分，我们可以把一个函数作为参数调用进来
+     * 这样的话，调用这个方法就可以一行代码搞定
+     * 只需要将实现Function的多个方法自由的调用即可
+     *
+     * @param cacheKey 缓存key
+     * @param clazz    从缓存get到的结果反序列化时需要的类型
+     * @param function 当缓存中没有数据的时候，需要执行查找的逻辑从而返回结果
+     * @return 返回缓存中的结果
+     */
+    public List<V> getResult(String cacheKey, Class<V> clazz,
+                             Function<String, List<V>> function) {
+        List<V> resultList = new ArrayList<>();
+        String content = localCache.getIfPresent(cacheKey);
+        if (StringUtils.isNotBlank(content)) {
+            resultList = JSON.parseArray(content, clazz);
+        } else {
+            resultList = function.apply(cacheKey);
+            if (!CollectionUtils.isEmpty(resultList)) {
+                localCache.put(cacheKey, JSON.toJSONString(resultList));
+            }
+        }
+        return resultList;
+    }
+
+    public Map<K, V> getMapResult(String cacheKey, Class<V> clazz,
+                                  Function<String, Map<K, V>> function) {
+        return new HashMap<>();
+    }
+
+}
+```
+
+
 
 ## 35. 你这个函数式编程配合泛型是为了解决什么问题？![](https://img.shields.io/badge/一般-g)
 
@@ -1117,12 +1182,15 @@ redis 作为缓存就可以适合这个场景了。但是可以去额外了解 *
 
 这个点我并没有在简历上写,自己暂时知道即可
 
+其实就体现对缓存工具类的抽取（看上面那个就🆗）
+
 :::
 
 对于我们大多数的场景，无非就是先查询缓存，缓存内没有数据，则去查询数据库。这个过程其实是一个很固定的模式。
 
-查询数据库的地方可以抽象为函数
-function，返回数据和入参可以作为泛型。中间和缓存的交互，我可以通过序列化，在工具内部进行判断。如果做了这个工具类，那就意味着，只要我调用工具类的一个静态方法，传入一个当缓存不存在的时候，我要执行的动作，那么就可以实现缓存的存入和读取了。
+查询数据库的地方可以抽象为函数function，返回数据和入参可以作为泛型。中间和缓存的交互，我可以通过序列化，在工具内部进行判断。如果做了这个工具类，那就意味着，只要我调用工具类的一个静态方法，传入一个当缓存不存在的时候，我要执行的动作，那么就可以实现缓存的存入和读取了。
+
+
 
 ## 36. 全文检索怎么做的，有高亮吗？
 
@@ -1135,22 +1203,240 @@ ik 分词器，更加的符合中文的切分逻辑。
 
 其实 **高亮** 本来就是先找到目标文字, 然后给目标文字 **加上使之高亮的标签**, 然后前端渲染这个带了高亮标签的文档, 这就是高亮
 
-## 37. 你封装的这个 es 工具有什么好处吗？
+## 37. 你封装的这个 es 工具有什么好处吗？<img src="https://img.shields.io/badge/一般-g" style="zoom:150%;" />
+
+::: warning
+
+其实🐔鸡哥这个还是很牛的，但是现在对ES掌握太浅，这点没写在简历，可以先不管
+
+:::
 
 我们在做 es 的时候，发现无论是 data 操作还是传统的 client 组装起来还是很麻烦的。其中有大量的需要组装的重复代码。
 
 还有集群和索引切换的情况基于这种情况，于是就封装了一个 esclient，其中封装了常见的各种使用，通过入参，传入属性，可以去做不同的查询逻辑，比如高亮，模糊，精准搜索等等。
 
-同时将 es 多集群，多索引的情况，通过加载的形式，放入了工厂 map，涉及不同 service 的场景，直接传入 key 就可以取到 es
-的链接。进行切换使用。这个小组件，在项目里面用起来十分的方便。
+同时将 es 多集群，多索引的情况，通过加载的形式，放入了工厂 map，涉及不同 service 的场景，直接传入 key 就可以取到 es的链接。进行切换使用。这个小组件，在项目里面用起来十分的方便。
 
 ## 38. 排行榜是如何设计的？
 
 直接看：https://www.yuque.com/jingdianjichi/kwag7a/dkdh73io7gxcbgxe
 
+首先请看 `补充` 中关于 `MaBatisPlus拦截器实现公共字段的插入或修改`，在这里我们把有关操作的用户信息，也就是一些公共字段，通过拦截器的方式，不侵入源代码结构的情况下，将这些字段插入或者修改
+
+而这些字段正是排行榜和点赞收藏等的主要依据
+
+*对于排行榜一般来说实时的，非实时的。*
+
+### 实时的方案
+
+**1. 从数据库统计**
+
+数据库里面的 `createby` 字段。用户的标识（其实就是 `username`， 我们用的是微信的 `openId`）是唯一的，则可以直接通过 `group by` 的形式统计 `count`。
+
+```sql
+select count(1),create_by from subject_info group by create_by limit 0,5;
+```
+
+数据量比较小，并发也比较小。这种方案是 ok 的。保证可以走到索引，返回速度快，不要产生慢 sql。
+
+在数据库层面加一层缓存，接受一定的延时性。
+
+**2. redis 的 sorted set**（有必要熟悉一下封装好的RedisUtil）
+
+有序集合，不允许重复的成员，然后每一个 key 都会包含一个 score 分数的概念。redis 根据分数可以帮助我们做从小到大，和从大到小的一个处理。有序集合的 key 不可重复，score 可重复。
+
+它是通过哈希表来实现的，添加，删除，查找，复杂度 o(1) ，最大数量是 2 的32 次方-1.
+
+`zadd zrange zincrby zscore` 
+
+这种做法的好处在于，完全不用和数据库做任何的交互，纯纯的通过缓存来做，速度非常快，但是要避免一些大 key 的问题。
+
+下面给出我们代码中的实现逻辑，首先是在每次插入题目的时候，将zset的对应用户的贡献+1
+
+然后再从redis中查到数据
+
+```java
+@Override
+@Transactional(rollbackFor = Exception.class)
+public void add(SubjectInfoBO subjectInfoBO) {
+    if (log.isInfoEnabled()) {
+        log.info("SubjectInfoDomainServiceImpl.add.bo:{}", JSON.toJSONString(subjectInfoBO));
+    }
+    // 设计到设计模式
+    // 假设全部写在主流程里面，判断type时，单选的调用单选service，多选的调用多选service...
+    // 这样判断起来太复杂了，所以用 工厂 + 策略 的开发形式
+    // 一个工厂 包含了 4种类型（单选、多选、判断、简答），根据输入的type自动映射选择处理
+    SubjectInfo subjectInfo = SubjectInfoConverter.INSTANCE.convertBoToInfo(subjectInfoBO);
+    subjectInfo.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
+    // 在insert的xml中设置了<selectKey>，已经把这次插入之后的自增长的id赋值给了subjectInfo的id属性
+    subjectInfoService.insert(subjectInfo);
+    // 通过不同的题型，还要为各种题型
+    SubjectTypeHandler handler = subjectTypeHandlerFactory.getHandler(subjectInfo.getSubjectType());
+    // 在这里插入不同题型的时候要插入subject_id，这就是上面<selectKey>的用处
+    subjectInfoBO.setId(subjectInfo.getId());
+    log.info("SubjectInfoDomainServiceImpl.add.subjectInfoBO:{}", subjectInfoBO);
+    handler.add(subjectInfoBO);
+    // 因为插入题目时，mapping表作为题目的分类以及标签之间的关联映射，所以还需要把这个关联映射信息添加
+    // 注意是多对多关系
+    List<Integer> categoryIds = subjectInfoBO.getCategoryIds();
+    List<Integer> labelIds = subjectInfoBO.getLabelIds();
+    LinkedList<SubjectMapping> mappingList = new LinkedList<>();
+    categoryIds.forEach(categoryId -> {
+        labelIds.forEach(labelId -> {
+            SubjectMapping subjectMapping = new SubjectMapping();
+            subjectMapping.setSubjectId(subjectInfo.getId());
+            subjectMapping.setCategoryId(Long.valueOf(categoryId));
+            subjectMapping.setLabelId(Long.valueOf(labelId));
+            subjectMapping.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode()); // 设置is_deleted属性
+            mappingList.add(subjectMapping);
+        });
+    });
+    subjectMappingService.batchInsert(mappingList);
+    // 同步到es
+    SubjectInfoEs subjectInfoEs = new SubjectInfoEs();
+    subjectInfoEs.setDocId(new IdWorkerUtil(1, 1, 1).nextId());
+    subjectInfoEs.setSubjectId(subjectInfo.getId());
+    subjectInfoEs.setSubjectAnswer(subjectInfoBO.getSubjectAnswer());
+    subjectInfoEs.setCreateTime(new Date().getTime());
+    subjectInfoEs.setCreateUser("York");
+    subjectInfoEs.setSubjectName(subjectInfo.getSubjectName());
+    subjectInfoEs.setSubjectType(subjectInfo.getSubjectType());
+    subjectEsService.insert(subjectInfoEs);
+    // [!code focus:3]
+    // redis利用zset的add计入排行榜，用incrementScore实现每插入一道题目就分数++
+    redisUtil.addScore(RANK_KEY, LoginUtil.getLoginId(), 1);
+}
+```
+
+```java
+/**
+     * 贡献榜
+     * 用zset实现，无需和数据库相关
+     */
+@Override
+public List<SubjectInfoBO> getContributeList() {
+    Set<ZSetOperations.TypedTuple<String>> typedTuples = redisUtil.rankWithScore(RANK_KEY, 0, 5);
+    if (log.isInfoEnabled()) {
+        log.info("getContributeList.typedTuples:{}", JSON.toJSONString(typedTuples));
+    }
+    if (CollectionUtils.isEmpty(typedTuples)) {
+        return Collections.emptyList();
+    }
+    List<SubjectInfoBO> boList = new LinkedList<>();
+    typedTuples.forEach(rank -> {
+        SubjectInfoBO subjectInfoBO = new SubjectInfoBO();
+        // zset的score，就是某个用户贡献的题目的数量
+        subjectInfoBO.setSubjectCount(rank.getScore().intValue());
+        // zset的value,通过rpc调用返回，结合我们插入的逻辑就知道，rank.getValue()其实就是username
+        // 所以可以靠RPC调用，即通过usename得到用户的信息
+        UserInfo userInfo = userRpc.getUserInfo(rank.getValue());
+        subjectInfoBO.setCreateUser(userInfo.getNickName());
+        subjectInfoBO.setCreateUserAvatar(userInfo.getAvatar());
+        boList.add(subjectInfoBO);
+    });
+    return boList;
+}
+```
+
+
+
+### 非实时方案
+
+定时任务 xxl-job。统计数据库的数据形式，帮助我们统计完成后，直接写入缓存。缓存的外部的交互展示。
+
 ## 39. 点赞和收藏怎么设计的？
 
 直接看：https://www.yuque.com/jingdianjichi/kwag7a/dkdh73io7gxcbgxe
+
+按照我们的鸡翅 club 的设计，点赞业务其实涉及几个方面：要知道一个题目被多少人点过赞，还要知道每个人点赞了哪些题目。
+
+点赞的业务特性：频繁。用户量级大的时候几乎时时刻刻都在进行点赞、收藏等等处理，如果说我们采取传统的数据库的模式啊，这个交互量是非常大的，很难去抗住这个并发问题，所以我们采取 redis 的方式来做。
+
+查询的数据交互，我们可以和 redis 直接来做，持久化的数据，通过数据库查询即可，这个数据如何去同步到数据库，我们就 **采取定时任务 xxl-job 定期来刷数据**。
+
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/%E7%82%B9%E8%B5%9E.jpg)
+
+记录的时候有三个关键信息，*点赞的人，被点赞的题目，点赞的状态*。
+
+因此选取的 **数据结构** 就是 `hash`，`string` 类型
+
+为什么是多个结构❓，因为一个点赞的信息，要对应我们上面说的这几个关键信息，要保证数据的一致性
+
+* hash类型
+
+  对于 `hashkey` 我们设计为 `subjectId:userId`，而 `hashval` 就存点赞的状态： 1 点赞 0 未点赞
+
+  举例：`SUBJECT_LIKED_KEY = "subject.liked"`，这就是这个 hash 结构的key
+
+  然后，hash 结构中的某个键值对的样例是：
+
+  ```java
+  String hashKey = buildSubjectLikedKey(subjectId.toString(), likeUserId);
+  redisUtil.putHash(SUBJECT_LIKED_KEY, hashKey, status);
+  ```
+
+  *所以它就是单纯记录，某一道题目被某个用户的点赞状态如何（针对于题目而言，对用户的统计）*
+
+* string 类型 
+
+  key `subjectId`，`val` 即题目被点赞的数量
+
+  举例：`countKey` 这个就是 string 类型的 key
+
+  ```java
+  String countKey = SUBJECT_LIKED_COUNT_KEY + "." + subjectId;
+  ```
+
+  因为是 string 类型， 所以每个题目都可以有一个这样的 key， 对应的 val 就是这倒题目被点赞的数量（在取消点赞和点赞的时候，根据这两种状态，要对这倒题目的点赞数量和点赞状态做改变）
+
+  *该键值对存储某个题目被点赞的数量*
+
+* string 类型 
+
+  key `subjectId:userId`， `val` 即
+
+  举例：`detailKey` 看样子，就是记录某个人对某道题的点赞状态如何
+
+  ```java
+  String detailKey = SUBJECT_LIKED_DETAIL_KEY + "." + subjectId + "." + likeUserId;
+  ```
+
+  就比如，一号题目被我点赞了，那么val就是“1”，否则没点赞过，就把这个键值对给删掉了
+
+  *针对于用户而言，对题目是否点赞这一状态的描述*
+
+```java
+	/**
+     * 点赞
+     * @param subjectLikedBO 主要用SubjectId和LikeUserId
+     */
+@Override
+public void add(SubjectLikedBO subjectLikedBO) {
+    Long subjectId = subjectLikedBO.getSubjectId();
+    String likeUserId = subjectLikedBO.getLikeUserId();
+    Integer status = subjectLikedBO.getStatus();
+    String hashKey = buildSubjectLikedKey(subjectId.toString(), likeUserId);
+    redisUtil.putHash(SUBJECT_LIKED_KEY, hashKey, status);
+    String detailKey = SUBJECT_LIKED_DETAIL_KEY + "." + subjectId + "." + likeUserId;
+    String countKey = SUBJECT_LIKED_COUNT_KEY + "." + subjectId;
+    if (SubjectLikedStatusEnum.LIKED.getCode() == status) {
+        // 点赞的话，把点赞数+1，将这个人点赞置为“1”
+        redisUtil.increment(countKey, 1);
+        redisUtil.set(detailKey, "1");
+    } else {
+        // 取消点赞
+        // 有个判断条件
+        Integer count = redisUtil.getInt(countKey);
+        if (Objects.isNull(count) || count <= 0) {
+            return;
+        }
+        redisUtil.increment(countKey, -1);
+        redisUtil.del(detailKey);
+    }
+}
+```
+
+
 
 ## 40. 项目有用到定时任务吗？怎么做的？
 
@@ -1323,7 +1609,161 @@ values (#{userName}, #{nickName}, #{email}, #{phone}, #{password}, #{sex}, #{ava
 
 
 
+## 6. MabtisPlus拦截器实现公共字段的插入或修改
 
+::: waning
+
+注意，本题和 38、39有关，做这一项任务就是为了铺垫排行榜和点赞收藏，因为正是 `“createdBy, createdTime, updatedBy, updatedTime”` 这几个字段的作用
+
+:::
+
+`MybatisInterceptor` 创建该拦截器，对于新增、修改的逻辑，将数据库中统一的 `“createdBy, createdTime, updatedBy, updatedTime”` 这几个字段添加，这样就不需要再其他代码逻辑中做无意义的重复操作，而是通过拦截器的方式统一处理，加快效率
+
+```java
+/**
+ * 填充createBy,createTime等公共字段的拦截器
+ * 涉及反射等操作
+ */
+@Component
+@Slf4j
+@Intercepts({@Signature(type = Executor.class, method = "update", args = {
+    MappedStatement.class, Object.class
+        })})
+public class MybatisInterceptor implements Interceptor {
+
+    @Override
+    public Object intercept(Invocation invocation) throws Throwable {
+        MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
+        SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
+        Object parameter = invocation.getArgs()[1];
+        if (parameter == null) {
+            return invocation.proceed();
+        }
+        //获取当前登录用户的id
+        String loginId = LoginUtil.getLoginId();
+        if (StringUtils.isBlank(loginId)) {
+            return invocation.proceed();
+        }
+        if (SqlCommandType.INSERT == sqlCommandType || SqlCommandType.UPDATE == sqlCommandType) {
+            replaceEntityProperty(parameter, loginId, sqlCommandType);
+        }
+        return invocation.proceed();
+    }
+
+    private void replaceEntityProperty(Object parameter, String loginId, SqlCommandType sqlCommandType) {
+        if (parameter instanceof Map) {
+            replaceMap((Map) parameter, loginId, sqlCommandType);
+        } else {
+            replace(parameter, loginId, sqlCommandType);
+        }
+    }
+
+    private void replaceMap(Map parameter, String loginId, SqlCommandType sqlCommandType) {
+        for (Object val : parameter.values()) {
+            replace(val, loginId, sqlCommandType);
+        }
+    }
+
+    private void replace(Object parameter, String loginId, SqlCommandType sqlCommandType) {
+        if (SqlCommandType.INSERT == sqlCommandType) {
+            dealInsert(parameter, loginId);
+        } else {
+            dealUpdate(parameter, loginId);
+        }
+    }
+
+    private void dealUpdate(Object parameter, String loginId) {
+        Field[] fields = getAllFields(parameter);
+        for (Field field : fields) {
+            try {
+                field.setAccessible(true);
+                Object o = field.get(parameter);
+                if (Objects.nonNull(o)) {
+                    field.setAccessible(false);
+                    continue;
+                }
+                if ("updateBy".equals(field.getName())) {
+                    field.set(parameter, loginId);
+                    field.setAccessible(false);
+                } else if ("updateTime".equals(field.getName())) {
+                    field.set(parameter, new Date());
+                    field.setAccessible(false);
+                } else {
+                    field.setAccessible(false);
+                }
+            } catch (Exception e) {
+                log.error("dealUpdate.error:{}", e.getMessage(), e);
+            }
+        }
+    }
+
+    private void dealInsert(Object parameter, String loginId) {
+        Field[] fields = getAllFields(parameter);
+        for (Field field : fields) {
+            try {
+                field.setAccessible(true);
+                Object o = field.get(parameter);
+                if (Objects.nonNull(o)) {
+                    field.setAccessible(false);
+                    continue;
+                }
+                if ("isDeleted".equals(field.getName())) {
+                    field.set(parameter, 0);
+                    field.setAccessible(false);
+                } else if ("createdBy".equals(field.getName())) {
+                    field.set(parameter, loginId);
+                    field.setAccessible(false);
+                } else if ("createdTime".equals(field.getName())) {
+                    field.set(parameter, new Date());
+                    field.setAccessible(false);
+                } else {
+                    field.setAccessible(false);
+                }
+            } catch (Exception e) {
+                log.error("dealInsert.error:{}", e.getMessage(), e);
+            }
+        }
+    }
+
+    private Field[] getAllFields(Object object) {
+        Class<?> clazz = object.getClass();
+        List<Field> fieldList = new ArrayList<>();
+        while (clazz != null) {
+            fieldList.addAll(new ArrayList<>(Arrays.asList(clazz.getDeclaredFields())));
+            clazz = clazz.getSuperclass();
+        }
+        Field[] fields = new Field[fieldList.size()];
+        fieldList.toArray(fields);
+        return fields;
+    }
+
+    @Override
+    public Object plugin(Object target) {
+        return Plugin.wrap(target, this);
+    }
+
+    @Override
+    public void setProperties(Properties properties) {
+    }
+
+}
+```
+
+接着把拦截器注入到MP的配置即可
+
+```java
+@Configuration
+public class MybatisConfiguration {
+
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor(){
+        MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
+        mybatisPlusInterceptor.addInnerInterceptor(new MybatisPlusAllSqlLog());
+        return mybatisPlusInterceptor;
+    }
+
+}
+```
 
 
 

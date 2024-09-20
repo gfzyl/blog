@@ -162,10 +162,11 @@ public List<String> getPermission(String userName) {
     if (StringUtils.isBlank(permissionValue)) {
         return Collections.emptyList();
     }
-    List<AuthPermission> permissionList = new Gson().fromJson(permissionValue,
-                                                              new TypeToken<List<AuthPermission>>() {
-                                                              }.getType());
-    return permissionList.stream().map(AuthPermission::getPermissionKey).collect(Collectors.toList());
+    List<AuthPermission> permissionList = new Gson().
+        fromJson(permissionValue, new TypeToken<List<AuthPermission>>(){}.getType());
+    return permissionList.stream()
+        .map(AuthPermission::getPermissionKey)
+        .collect(Collectors.toList());
 }
 ```
 
