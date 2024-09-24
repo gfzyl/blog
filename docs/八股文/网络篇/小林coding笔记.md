@@ -8,7 +8,7 @@
 
 可能需要停一下, 我发现边看边记效率太低了, 先整体看完再说比较好
 
-https://www.xiaolincoding.com/
+[跳转到小林coding](https://www.xiaolincoding.com/interview/network.html)
 
 :::
 
