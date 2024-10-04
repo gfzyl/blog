@@ -50,6 +50,24 @@ Spring Boot 的自动配置功能可以根据项目的依赖和配置自动设�
 
 例如，自动配置数据源时，Spring Boot 会检查 `DataSource` 类是否存在，以及容器中是否已存在相应的 Bean。如果这些条件都满足，系统就会自动注册 DataSource Bean。如果需要禁用某些自动配置，可以在 `@SpringBootApplication` 注解中使用 `exclude` 属性，或者在 `application.properties` 文件中配置。这种机制让开发者能更专注于业务逻辑，而不是繁琐的配置，理解它的原理有助于更好地利用 Spring Boot 的优势。
 
+------
+
+>SpringBoot的目动装配原埋是基于Spring Framework的条件化配置和@EnableAutonfiguration江解头现种机制允许开发者在项目中引入相关的依赖，SpringBoot 将根据这些依赖自动配置应用程序的上下文和功能。
+>
+>SpringBoot 定义了一套接口规范，这套规范规定:SpringBoot 在启动时会扫描外部引用jar 包中的META-INF/spring.factories文件，将文件中配置的类型信息加载到 Spring 容器(此处涉及到 JM 类加载机制与 Spring的容器知识)，并执行类中定义的各种操作。对于外部jar 来说，只需要按照 SpringBoot 定义的标准，就能将自的功能装置进 SpringBoot。
+>
+>通俗来讲，自动装配就是通过注解或一些简单的配置就可以在SpringBoot的帮助下开启和配置各种功能，比如数据库访问、Web开发。
+
+`@SpringBootApplication` 这个注解点开以后会发现一堆注解
+
+* @Target：该注解指定了这个注解可以用来标记在类上。在这个特定的例子中@Target({ElementType.TYPE})，这表示该注解用于标记配置类。
+* @Retention(RetentionPolicy.RUNTIME)：这个注解指定了注解的生命周期，即在运行时保留。这是因为Spring Boot 在运行时扫描类路径上的注解来实现自动配置，所以这里使用了 RUNTIME 保留策略。
+* @Documented：该注解表示这个注解应该被包含在 Java 文档中。它是用于生成文档的标记，使开发者能够看到这个注解的相关信息。
+* @Inherited：**这个注解指示一个被标注的类型是被继承的**。在这个例子中，它表明这个注解可以被继承，如果一个类继承了带有这个注解的类，它也会继承这个注解。
+* @SpringBootconfiguration：这个注解表明这是一个 Spring Boot 配置类。如果点进这个注解内部会发现与标准的 `@Configuration` 没啥区别，只是为了表明这是一个专门用于 SpringBoot 的配置。
+* @EnableAutoconfiguration：这个注解是 Spring Boot 自动装配的核心。它告诉 Spring oot 启用自动配置机制，根据项目的依赖和配置自动配置应用程序的上下文。通过这个注解，SpringBoot 将尝试根据类路径上的依赖自动配置应用程序。
+* @ComponentScan：这个注解用于配置组件扫描的规则。在这里，它告诉 SpringBoot 在指定的包及其子包中查找组件，这些组件包括被注解的类、@Component 注解的类等。其中的 excludefilters 参数用于指定排除哪些组件，这里使用了两个自定义的过滤器，分别是TypeExcludeFilter 和AutoConfigurationExcludeFilter.
+
 ## 6. SpringBoot配置文件注入
 
 **口语化回答**：
@@ -139,3 +157,32 @@ Spring Boot 提供了多种方法来激活不同的配置 Profile，方便你根
 **口语化回答**
 
 在 Spring Boot 中整合 Redis，可以通过几个简单的步骤来实现，包括添加依赖、配置 Redis 连接、创建配置类，以及使用 `RedisTemplate` 进行操作。这使得在应用中使用 Redis 变得非常方便，可以有效地进行缓存和数据存储。
+
+## 20. SpringBoot 用到了哪些设计模式
+
+* 代理模式：Spring 的 AOP 通过动态代理实现方法级别的切面增强，有静态和动态两种代理方式，采用动态代理方式。
+* 策略模式：Spring AOP 支持 JDK 和 Cglib 两种动态代理实现方式，通过策略接口和不同策略类，运行时动态选择，其创建一般通过工厂方法实现。
+* 装饰器模式；Spring 用 TransactionAwareCacheDecorator 解决缓存与数据库事务问题增加对事务的支持
+* 单例模式：Spring Bean 默认是单例模式，通过单例注册表(如 HashMap)实现。
+* 简单工厂模式：Spring 中的 Beanfactory 是简单工厂模式的体现，通过工厂类方法获取 Bean 实例。
+* 工厂方法模式：Spring中的 FactoryBean 体现工厂方法模式，为不同产品提供不同工厂。
+* 观察者模式：Spring 观察者模式包含 Event 事件、Listener 监听者、Publisher 发送者，通过定义事件、监听器和发送者实现，观察者注册在 Applicationcontext 中，消息发送由ApplicationEventMulticaster 完成。
+* 模板模式：Spring Bean 的创建过程涉及模板模式，体现扩展性，类似 Callback 回调实现方式。
+* 适配器模式：Spring MVC 中针对不同方式定义的 Controller，利用适配器模式统一函数定义，定义了统-接囗 HanderAdapter 及对应适配器类,
+
+## 21. 怎么理解SpringBoot中的约定大于配置
+
+* 自动化配置：Spring Boot 提供了大量的自动化配置，通过分析项目的依赖和环境，自动配置应用程序的行为。开发者无需显式地配置每个细节，大部分常用的配置都已经预设好了。例如，Spring Boot 可以根据项目中引入的数据库依赖自动配置数据源。
+* 默认配置：Spring Boot 在没有明确配置的情况下，会使用合理的默认值来初始化应用程序。这种默认行为使得开发者可以专注于核心业务逻辑，而无需关心每个细节的配置。
+* 约定优于配置：Spring Boot 遵循了约定优于配置的设计哲学，即通过约定好的方式来提供默认行为，减少开发者需要做出的决策。例如，约定了项目结构、Bean 命名规范等，使得开发者可以更快地上手并保持团队间的一致性。
+
+Spring Boot 的”约定大于配置”原则是一种 *设计理念*，通过减少配置和提供合理的默认值，使得开发者可以更快速地构建和部署应用程序，同时降低了入门门槛和维护成本。
+
+Spring Boot通过「*自动化配置*」和「*起步依赖*」实现了约定大于配置的特性。
+
+* 自动化配置：Spring Boot根据项目的依赖和环境自动配置应用程序，无需手动配置大量的XML或Java配置文件。例如，如果项目引入了Spring Web MVC依赖，Spring Boot会自动配置一个基本的Web应用程序上下文。
+* 起步依赖（stater依赖）：Spring Boot提供了一系列起步依赖，这些依赖包含了常用的框架和功能，可以帮助开发者快速搭建项目。
+
+## 21. SpringBoot的项目结构是怎么样的？
+
+![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/1721712159282-79195670-9acf-4bfb-93b1-47d089a4bc1c.png)

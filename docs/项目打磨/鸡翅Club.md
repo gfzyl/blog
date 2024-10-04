@@ -761,7 +761,17 @@ feign 的拦截器交互。然后提供了全局的 `Util` 操作，只要应用
 
 ### 细节：
 
-1. #### 网关层面的全局拦截器 `LoginFilter`<img src="https://img.shields.io/badge/重要-red" style="zoom:150%;" />
+::: tip 前置知识
+
+详细请看文章：「拦截器和过滤器，执行顺序到底是哪个先呢」
+
+过滤器和拦截器的作用不太一样，还是严谨一些
+
+除了登录以外的拦截器
+
+:::
+
+1. #### 网关层面的全局过滤器 `LoginFilter`<img src="https://img.shields.io/badge/重要-red" style="zoom:150%;" />
 
    这个是开头，所有的请求都要先打到网关，在网关中把信息放到Header中去
 
@@ -1765,11 +1775,24 @@ public class MybatisConfiguration {
 }
 ```
 
+## 7. 什么是token？
 
+Token，也称为“令牌”，是服务端生成的一串字符串，以作客户端进行请求的一个令牌，当第一次登录后，服务器生成一个Token便将此Token返回给客户端，以后客户端只需带上这个Token前来请求数据即可，无需再次带上用户名和密码。比如如下形式：eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJEenUyMDIwMDEwMTEwMzEiLCJleHAiOjE3MTQwNTM2MDV9.VBIWPBzGJRhwCB_jhI-wjZF8ErEFfpQkZOUmFxYQs5k
 
+二、为什么使用Token
+传统验证用户身份的方式，大多为基于服务器验证的方式，即cookie+session的方式，由于HTTP协议是无状态的，导致程序需要验证每一次请求，从而辨别客户端的身份。
 
+用户登录成功将其信息存入session中，用户每次请求都会将携带session id的cookie一起发送器服务端，进行校验，随着Web、应用程序、以及移动端的崛起，这种验证方式弊端逐渐显现，尤其是在可扩展性方面。
 
+引发的问题比如用户增多导致内存开销较大、CORS(跨域资源共享)以及CSRF(跨站请求伪造)等。
 
+引入Token验证机制后，请求会发送token而不再是发送cookie能有效够防止CSRF，即使在客户端使用cookie存储token，但cookie也只有存储功能，而不再具备验证功能，因此安全性得到了极大的提高。
+
+而且只要token设计的足够复杂，除非用户泄露，否则几乎没有被破解的可能，加上token是有时效的，在有限的时间加上有限的算力，更是无懈可击，这也类似于加密资产比如比特币钱包对应的私钥，安全性极高。
+
+另外Token可以有效减轻服务器的压力，减少频繁的查询数据库，使服务器更加健壮。
+
+*登录之后后端就会返回 标识每个用户唯一状态的token，这个token就是接下来请求都要用到的，但是用户对这个是透明的，你总不能让用户自己收到token，然后每次都拿token自己发请求，这不现实，所以实现逻辑其实是前端完成收集登录之后的token，并在接下来的请求中带上token*
 
 
 

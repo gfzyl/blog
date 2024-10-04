@@ -10,6 +10,51 @@
 
 :::
 
+## 手撕CAS
+
+```java
+/**
+ * @author York
+ * @className SpinLockDemo
+ * @date 2024/09/14 22:00
+ * @description 手撕CAS 利用AtomicReference原子引用
+ */
+public class SpinLockDemo {
+
+    AtomicReference<Thread> bookAtomicReference = new AtomicReference<>();
+
+    public void lock(){
+        Thread thread = Thread.currentThread();
+        System.out.println(thread.getName() + "------come in...");
+        while (!bookAtomicReference.compareAndSet(null, thread)) {
+        }
+    }
+
+    public void unlock(){
+        Thread thread = Thread.currentThread();
+        bookAtomicReference.compareAndSet(thread,null);
+        System.out.println(thread.getName() + "------come out...");
+    }
+
+    public static void main(String[] args) {
+        SpinLockDemo spinLockDemo = new SpinLockDemo();
+        new Thread(() -> {
+            spinLockDemo.lock();
+            try {TimeUnit.SECONDS.sleep(2);} catch (InterruptedException e){ e.printStackTrace();}
+            spinLockDemo.unlock();
+        }).start();
+        // 为了让上面那个线程先持有锁, 让下面的锁争用
+        try {TimeUnit.MILLISECONDS.sleep(500);} catch (InterruptedException e){ e.printStackTrace();}
+
+        new Thread(() -> {
+            spinLockDemo.lock();
+            System.out.println(Thread.currentThread().getName() + " says:------I got it...");
+            spinLockDemo.unlock();
+        }).start();
+    }
+}
+```
+
 ## 如何使用两个栈实现队列？
 
 使用两个栈实现队列的方法如下:
@@ -98,7 +143,7 @@ class MyQueue{
 
 ## 红黑树说一下，跳表说一下？
 
-###红黑树(Red-Black Tree)
+### 红黑树(Red-Black Tree)
 
 是一种自平衡的二又搜索树，它在插入和删除操作后能够 **通过旋转和重新着色来保持树的平衡** 。红黑树的特点如下:
 
@@ -156,7 +201,7 @@ class MyQueue{
 * **检索路径**：B树在查找数据时，可能在非叶子节点找到目标数据，路径长度不固定。即查找时可以在任意一个节点终止。B+树中所有数据都在叶子节点，查找数据时必须走到叶子节点，路径长度固定(均等)。即查找总是要到叶子节点结束
 * **叶子节点结构**：B树中叶子节点之间没有特别的链接，彼此独立。B+树中叶子节点通过指针连接，形成一个有序链表，便于范围查询和顺序访问。
 * **非叶子节点内容**：B树中非叶子节点存储数据和索引。B+树中非叶子节点只存储索引，不存储实际数据。因此，当数据量比较大时，相对于B树，B+树的层高更少，查找效率也就更高
-* **高效地范围查询**：B+树叶子节点采用的是双链表连接，适合 MySQL 中常见的基于范围的顺序查找，而8树在进行范围查询时需要进行中序遍历，性能较差。
+* **高效地范围查询**：B+树叶子节点采用的是双链表连接，适合 MySQL 中常见的基于范围的顺序查找，而B树在进行范围查询时需要进行中序遍历，性能较差。
 
 ## 堆是什么？
 
@@ -168,7 +213,7 @@ class MyQueue{
 
 LRU即，最近最少使用，是一种缓存淘汰算法，当缓存空间已满时，优先淘汰最长时间未被访问的数据，实现是 **哈希表+双向链表**
 
-之前我们背八股的时候，遇到 *LinkedHashMap*，他天生可以作为LRU算法的数据结构，因为他的一个属性 *`accessOrder`*打开以后就会在访问时不断地更新链表的顺序结构
+之前我们背八股的时候，遇到 *LinkedHashMap*，他天生可以作为LRU算法的数据结构，因为他的一个属性 `accessOrder` 打开以后就会在访问时不断地更新链表的顺序结构
 
 ```java
 // 创建一个带有 LRU 机制的 LinkedHashMap

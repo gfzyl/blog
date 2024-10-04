@@ -181,3 +181,59 @@ public Movie(String name) {
 
 * 浅拷贝是指只复制对象本身和其内部的值类型字段，但不会复制对象内部的引用类型字段。换句话说浅拷贝只是创建一个新的对象，然后将原对象的字段值复制到新对象中，但如果原对象内部有引用类型的字段，只是将引用复制到新对象中，两个对象指向的是同一个引用对象。
 * 深拷贝是指在复制对象的同时，将对象内部的所有引用类型字段的内容也复制一份，而不是共享引用。换句话说，深拷贝会递归复制对象内部所有引用类型的字段，生成一个全新的对象以及其内部的所有对家。
+
+## 在 Java 中实现单例模式（懒汉模式和饿汉模式）考虑多线程的环境。
+
+### 1. 懒汉模式（Lazy Initialization）
+
+懒汉模式的特点是延迟实例化，即只有在第一次使用时才创建对象。为了保证线程安全，可以使用**双重检查锁定（Double-Checked Locking）**，配合 `volatile` 关键字来确保变量的可见性。
+
+```java
+public class SingletonLazy {
+    // 使用 volatile 确保多线程间的可见性
+    private static volatile SingletonLazy instance = null;
+
+    // 私有构造函数，防止外部实例化
+    private SingletonLazy() {}
+
+    // 提供线程安全的全局访问点
+    public static SingletonLazy getInstance() {
+        if (instance == null) {
+            synchronized (SingletonLazy.class) {
+                if (instance == null) {
+                    instance = new SingletonLazy(); // 懒加载
+                }
+            }
+        }
+        return instance;
+    }
+}
+```
+
+**解释：**
+- 使用 `volatile` 保证 instance 对所有线程的可见性，防止指令重排序。
+- 双重检查锁定（`if (instance == null)`）确保只在实例未初始化时才进入同步块，提升性能。
+
+### 2. 饿汉模式（Eager Initialization）
+
+饿汉模式的特点是类加载时就创建实例，不管是否使用，故线程天生安全。但这种方式在某些情况下可能会造成不必要的资源浪费（比如程序中没有用到该实例）。
+
+```java
+public class SingletonEager {
+    // 类加载时立即创建对象
+    private static final SingletonEager instance = new SingletonEager();
+
+    // 私有构造函数，防止外部实例化
+    private SingletonEager() {}
+
+    // 提供全局访问点
+    public static SingletonEager getInstance() {
+        return instance;
+    }
+}
+```
+
+**解释：**
+- 实例在类加载时创建，利用类加载机制保证线程安全。
+- 没有涉及到同步开销，调用速度快，但不管是否使用都会创建实例。
+
