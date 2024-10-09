@@ -5,6 +5,10 @@
 JDK 8 引入了流式计算（Stream API），它为集合类提供了一种高效、可读性强的操作方式。Stream API 允许你以声明式的方式处理数据，并且支持并行计算。下面是
 JDK 8 中流式计算的主要 API 及其相应的示例。
 
+
+
+Java 8引入了Stream API，它提供了一种高效且易于使用的数据处理方式，特别适合集合对象的操作，如过滤、映射、排序等。Stream AP!不仅可以提高代码的可读性和简洁性，还能利用多核处理器的优势讲行并行处理。让我们通过两个具体的例子来感受下Java Stream APl带来的便利，对比在Stream AP引入之前的传统做法。
+
 :::
 
 ## 1. **创建流 (Stream Creation)**
@@ -185,3 +189,26 @@ List<String> result = list.parallelStream()
 ## 总结
 
 JDK 8 的 Stream API 提供了强大的流式数据处理功能，允许你以声明式的方式对集合进行复杂的操作。通过使用流，可以写出更简洁、更易维护的代码，同时在需要时利用并行流提高性能。
+
+## 典型案例——计算列表中所有数字的总和
+
+没有Stream APl的做法:
+
+```java
+List<Integer>numbers=Arrays.asList(1，2，3，4，5);
+int sum = 0;
+for(Integer number :numbers){
+    sum += number;
+}
+```
+
+这个传统的for-each循环遍历列表中的每一个元素，累加它们的值来计算总和。使用stream APl的做法:
+
+```java
+List<Integer>numbers=Arrays.asList(1，2，3，4，5);
+int sum = numbers.stream()
+    .mapToInt(Integer::intValue)
+    .sum();
+```
+
+通过Stream API，我们可以先使用 `mapToInt()` 将 `Integer` 流转换为 `Intstream` (这是为了高效处理基本类型)，然后直接调用 `sum()` 方法来计算总和，极大地简化了代码。
