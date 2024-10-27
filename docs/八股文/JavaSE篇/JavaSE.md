@@ -54,6 +54,7 @@ double会出现精度丢失的问题，double执行的是 **二进制浮点运�
 
 ### 非静态内部类可以直接访问外部方法，编译器是怎么做到的?
 非静态内部类可以直接访问外部方法是因为编译器在生成字节码时会为非静态内部类维护一个指向外部类实例的引用。
+
 这个引用使得非静态内部类能够访问外部类的实例变量和方法。编译器会在生成非静态内部类的构造方法时，将外部类实例作为参数传入，并在内部类的实例化过程中建立外部类实例与内部类实例之间的联系从而实现直接访问外部方法的功能,
 
 ## 5. 代码块——相当于另一种形式的构造器（对构造器的补充机制，可做初始化操作）
@@ -501,17 +502,17 @@ Spring通过XML配置模式装载Bean的过程:
 
 ![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/1720683900898-1d0ce69d-4b5d-41a6-a5df-022e42f8f4c5.webp)
 
-Java的异常体系主要基于两大类:Throwable类及其子类。Throwable有两个重要的子类:Error和Exception，它们分别代表了不同类型的异常情况。
+Java的异常体系主要基于两大类：Throwable类及其子类。Throwable有两个重要的子类:Error和Exception，它们分别代表了不同类型的异常情况。
 
-1. Error(错误):表示运行时环境的错误。**错误是程序无法处理的严重问题**，如系统崩溃、虚拟机错误、动态链接失败等。通常，程序不应该尝试捕获这类错误。例如，0utOfMemoryError、StackOverflowError等
+1. Error(错误)：表示运行时环境的错误。**错误是程序无法处理的严重问题**，如系统崩溃、虚拟机错误、动态链接失败等。通常，程序不应该尝试捕获这类错误。例如，0utOfMemoryError、StackOverflowError等
 
-2. Exception(异常):表示 **程序本身可以处理的异常条件**。
+2. Exception(异常)：表示**程序本身可以处理的异常条件**。
 
    异常分为两大类:
 
-   非运行时异常:这类异常在编译时期就必须被捕获或者声明抛出。它们通常是外部错误，如文件不存在。(FileNotFoundException)、类未找到(ClassNotFoundException)等。非运行时异常强制程序员处理这些可能出现的问题，增强了程序的健壮性。
+   非运行时异常：这类异常在**编译时期**就必须被捕获或者声明抛出。它们通常是外部错误，如文件不存在(FileNotFoundException)、类未找到(ClassNotFoundException)等。非运行时异常强制程序员处理这些可能出现的问题，增强了程序的健壮性。
 
-   运行时异常:这类异常包括运行时异常(RuntimeException)和错误(Error)。运行时异常由程序错误导致如空指针访问(NullPointerException)、数组越界(ArrayIndexOutOfBoundsException)等。运行时异常是不需要在编译时强制捕获或声明的。
+   运行时异常：运行时异常由程序错误导致如空指针访问(NullPointerException)、数组越界(ArrayIndexOutOfBoundsException)等。运行时异常是不需要在编译时强制捕获或声明的。
 
 ## 20. try{return “a”} fianlly{return“b”}这条语句返回啥
 

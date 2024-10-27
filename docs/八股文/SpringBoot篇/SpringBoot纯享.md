@@ -6,6 +6,8 @@
 
 Spring Boot 是一个用来简化 Spring 开发的工具，能让你不用花太多时间配置各种东西。它自带很多默认设置，比如你不用手动配置 Web 服务器，它就已经帮你集成好了 Tomcat，可以直接通过一个 JAR 文件运行你的应用。这也让它特别适合做微服务，因为每个服务都能独立运行。另外，它还提供了很多监控、健康检查等功能，帮助你更好地管理应用。总之，Spring Boot 让开发变得更轻松，特别是快速搭建应用时非常方便。
 
+使用@Transactional注解即可打开事务
+
 ## 2. SpringBoot的优缺点
 
 **口语化回答**  
@@ -186,3 +188,23 @@ Spring Boot通过「*自动化配置*」和「*起步依赖*」实现了约定�
 ## 21. SpringBoot的项目结构是怎么样的？
 
 ![](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/1721712159282-79195670-9acf-4bfb-93b1-47d089a4bc1c.png)
+
+## 22. 说几个启动器(starter)?
+
+* spring-boot-starter-web:这是最常用的起步依赖之一，它包含了Spring MVC和Tomcat嵌入式服务器，用于快速构建Web应用程序。
+* spring-boot-starter-security:提供了Spring Security的基本配置，帮助开发者快速实现应用的安全性，包括认证和授权功能。
+* mybatis-spring-boot-starter:这个Starter是由MyBatis团队提供的，用于简化在Spring Boot应用中集成MyBatis的过程。它自动配置了MyBatis的相关组件，包括SqlSessionFactory、MapperScannerConfigurer等，使得开发者能够快速地开始使用MyBatis进行数据库操作。
+* spring-boot-starter-data-jpa或 spring-boot-starter-jdbc: 如果使用的是Java Persistence API (PA)进行数据库操作，那么应该使用spring-boot-starter-data-jpa。这个Starter包含了Hibernate等JPA实现以及数据库连接池等必要的库，可以让你轻松地与MySQL数据库进行交互。你需要在application.properties或application.ym|中配置MySQL的连接信息。如果倾向于直接使用JDBC而不通过JPA，那么可以使用spring-boot-starter-jdbc，它提供了基本的JDBC支持。
+* spring-boot-starter-data-redis:用于集成Redis缓存和数据存储服务。这个Starter包含了与Redis交互所需的客户端(默认是Jedis客户端，也可以配置为Lettuce客户端)，以及Spring Data Redis的支持使得在Spring Boot应用中使用Redis变得非常便捷。同样地，需要在配置文件中设置Redis服务器的连接详情。
+* spring-boot-starter-test:包含了单元测试和集成测试所需的库，如Jnit, Spring Test,Assert等，便于进行测试驱动开发(TDD)。
+
+## 23. SpringBoot里面有哪些重要的注解?还有一个配置相关的注解是哪个?
+* @SpringBootApplication:用于标注主应用程序类，标识一个Spring Boot应用程序的入口点，同时启用自动配置和组件扫描。
+* @Controller:标识控制器类，处理HTTP请求。
+* @RestController:结合@Controller和@ResponseBody，返回RESTful风格的数据@Service:标识服务类，通常用于标记业务逻辑层。
+* @Repository:标识数据访问组件，通常用于标记数据访问层。
+* @Component:通用的Spring组件注解，表示一个受Spring管理的组件
+* @Autowired:用于自动装配Spring Bean。
+* @Value:用于注入配置属性值。
+* @RequestMapping:用于映射HTTP请求路径到Controller的处理方法。@GetMapping、@PostMapping、@PutMapping、@DeleteMapping:简化@RequestMapping的GET、POST、PUT和DELETE请求.
+* @Configuration:用于指定一个类为配置类，其中定义的bean会被Spring容器管理。通常与@Bean配合使用，@Bean用于声明一个Bean实例，由Spring容器进行管理。（与配置相关）

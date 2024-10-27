@@ -6,6 +6,20 @@
 
 :::
 
+## 前置——MVC分层介绍一下
+
+MVC全名是Model View Controller，是模型(model)-视图(view)-控制器(controller)的缩写，一种软件设计典范，**用一种业务逻辑、数据、界面显示分离的方法组织代码**，将业务逻辑聚集到一个部件里面，在改进和个性化定制界面及用户交互的同时，不需要重新编写业务逻辑。
+
+视图(view):为用户提供使用界面，与用户直接进行交互。
+
+模型(model): 代表一个存取数据的对象或JAVA POJO(Plain Old Java Object，简单java对象)。它也可以带有逻辑，主要用于承载数据，并对用户提交请求进行计算的模块。模型分为两类，*一类称为数据承载 Bean，一类称为业务处理Bean*。所谓数据承载 Bean 是指实体类(如:User类)，:专门为用户承载业务数据的;而业务处理 Bean 则是指Service 或 Dao 对象，专门用于处理用户提交请求的。
+
+控制器(controller): 用于将用户请求转发给相应的 Model 进行处理，并根据 Model 的计算结果向用户提供相应响应。它使视图与模型分离。
+
+### 流程步骤:
+
+用户通过View 页面向服务端提出请求，可以是表单请求、超链接请求、AJAX 请求等，服务端 Controller 控制器接收到请求后对请求进行解析，找到相应的Model，对用户请求进行处理Model 处理；将处理结果再交给 Controller(**控制器其实只是起到了承上启下的作用**)；根据处理结果找到要作为向客户端发回的响应View 页面，页面经渲染后发送给客户端
+
 ## 1. 什么是SpringMVC
 
 Spring MVC 是 Spring 框架中的一个模块，用于构建基于 Web 的应用程序。它遵循 Model-View-Controller#(MVC)
@@ -41,6 +55,8 @@ Spring MVC 是 Spring 框架中的一个模块，用于构建基于 Web 的应�
 5. Handler Mapping:根据请求 URL 查找相应的控制器。
 
 ## 2. SpringMVC的原理及执行流程？
+
+![img](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/1716791047520-ac0d9673-be0a-4005-8732-30bdedc8f1af.webp)
 
 **组件**
 
