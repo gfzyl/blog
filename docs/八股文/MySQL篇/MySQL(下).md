@@ -1,5 +1,11 @@
 # MySQL篇(下)
 
+::: tip 笔者声明
+
+笔者声明：呃呃自从写了纯享版还有看了小林的《图解MySQL》系列之后感觉这里写的上下篇没有什么深度，偶尔来看看还行，就先不删档了，推荐从纯享版开始看，然后看各个细类
+
+:::
+
 雪花算法和UUID
 
 ![img](https://york-blog-1327009977.cos.ap-nanjing.myqcloud.com//APE-FRAME%E8%84%9A%E6%89%8B%E6%9E%B6%E9%A1%B9%E7%9B%AE/1d3fc4b2ff944837874d3c95d1b59d5e.png)

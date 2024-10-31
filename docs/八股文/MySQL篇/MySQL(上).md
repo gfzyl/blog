@@ -8,6 +8,8 @@
 
 **分割线以下去多看即可,是上面背诵部分的详细解释**
 
+笔者声明：呃呃自从写了纯享版还有看了小林的《图解MySQL》系列之后感觉这里写的上下篇没有什么深度，偶尔来看看还行，就先不删档了，推荐从纯享版开始看，然后看各个细类
+
 :::
 
 ## 1. MySQL事务的四大特性
@@ -590,19 +592,19 @@ EXPLAIN SELECT * FROM employees WHERE department = 'Sales';
 **详细回答**
 
 1. **避免全表扫描**：
-   
+  
    在 WHERE 和 ORDER BY 子句中涉及的列上建立索引，避免全表扫描。全表扫描会显著影响查询性能，特别是数据量大的时候。
    
 2. **避免 NULL 值判断**：
-   
+  
    在 WHERE 子句中对字段进行 NULL 值判断会导致索引失效。创建表时尽量将字段设置为 NOT NULL，或者使用特殊的默认值（如 0 或 -1）来代替 NULL。
    
 3. **避免 != 或 <> 操作符**：
-   
+  
    MySQL 对于 != 和 <> 操作符的优化不如对 <、<=、=、>、>=、BETWEEN、IN 等操作符的优化好，这些操作符能更有效地利用索引，从而提高查询性能。
    
 4. **避免 OR 条件**：
-   
+  
    使用 OR 连接条件可能导致全表扫描。可以将多个查询用 UNION 合并，改写为：
    ```sql
    SELECT id FROM t WHERE num = 10
@@ -611,32 +613,32 @@ EXPLAIN SELECT * FROM employees WHERE department = 'Sales';
    ```
    
 5. **谨慎使用 IN 和 NOT IN**：
-   
+  
    IN 和 NOT IN 操作符可能导致全表扫描。对于连续数值的范围查询，使用 BETWEEN 替代 IN，例如：
    ```sql
    SELECT id FROM t WHERE num BETWEEN 1 AND 3;
    ```
    
 6. **LIKE 查询优化**：
-   
+  
    避免使用 `%abc%` 或 `%abc` 这样的 LIKE 查询，这会导致全表扫描。对于这种情况，可以考虑使用全文检索。只有以 `abc%` 开头的 LIKE 查询才可能利用索引。
    
 7. **避免参数化查询导致的全表扫描**：
-   
+  
    参数化查询有时可能导致全表扫描，特别是当参数值不能被优化器推断时。可以通过强制使用索引来优化查询，例如：
    ```sql
    SELECT id FROM t WITH (INDEX(index_name)) WHERE num = @num;
    ```
    
 8. **避免表达式操作**：
-   
+  
    在 WHERE 子句中对字段进行表达式操作（如函数或算术运算）会导致全表扫描，因为这些操作会使索引失效。例如，不要写：
    ```sql
    SELECT * FROM t WHERE YEAR(date_column) = 2024;
    ```
    
 9. **使用 EXISTS 替代 IN**：
-   
+  
    EXISTS 通常比 IN 更高效，因为 EXISTS 会在找到符合条件的记录后停止搜索，而 IN 会扫描整个子查询结果集。例如：
    ```sql
    SELECT num FROM a WHERE EXISTS (
@@ -1022,7 +1024,7 @@ SELECT * FROM websites WHERE url LIKE 'http://example%';
 在 MySQL 中，索引失效的情况可能导致查询性能下降。以下是一些常见的索引失效情况：
 
 1. **使用函数或表达式**
-   
+  
    **情况**: 在索引列上使用函数或表达式（如 `UPPER(column)`, `column+1`）会导致索引失效。
    
    **示例**:
@@ -1032,7 +1034,7 @@ SELECT * FROM websites WHERE url LIKE 'http://example%';
    ```
    
 2. **隐式类型转换**
-   
+  
    **情况**: 查询条件中的数据类型与索引列的数据类型不匹配时，MySQL 可能会进行隐式类型转换，从而导致索引失效。
    
    **示例**:
@@ -1042,7 +1044,7 @@ SELECT * FROM websites WHERE url LIKE 'http://example%';
    ```
    
 3. **使用 OR 条件**
-   
+  
    **情况**: 如果 `OR` 条件中的列没有索引或无法同时使用索引，也会导致索引失效。
    
    **示例**:
@@ -1052,7 +1054,7 @@ SELECT * FROM websites WHERE url LIKE 'http://example%';
    ```
    
 4. **前导模糊查询**
-   
+  
    **情况**: 在 `LIKE` 查询中，如果模式以通配符（如 `%`）开头，索引将失效。
    
    **示例**:
@@ -1062,7 +1064,7 @@ SELECT * FROM websites WHERE url LIKE 'http://example%';
    ```
    
 5. **不等于操作**
-   
+  
    **情况**: 使用不等于操作符（如 `!=` 或 `<>`）通常会导致索引失效。
    
    **示例**:
@@ -1072,7 +1074,7 @@ SELECT * FROM websites WHERE url LIKE 'http://example%';
    ```
    
 6. **IS NULL 或 IS NOT NULL**
-   
+  
    **情况**: 对于某些存储引擎，使用 `IS NULL` 或 `IS NOT NULL` 可能会导致索引失效。
    
    **示例**:
@@ -1082,7 +1084,7 @@ SELECT * FROM websites WHERE url LIKE 'http://example%';
    ```
    
 7. **范围条件后再使用等值条件**
-   
+  
    **情况**: 在复合索引中，如果使用了范围条件（如 `<`, `>`, `BETWEEN`），后面的等值条件可能无法使用索引。
    
    **示例**:
@@ -1092,7 +1094,7 @@ SELECT * FROM websites WHERE url LIKE 'http://example%';
    ```
    
 8. **不满足最左前缀原则**
-   
+  
    **情况**: 对于复合索引，查询条件必须满足最左前缀原则，否则索引将失效。
    
    **示例**:
@@ -1102,7 +1104,7 @@ SELECT * FROM websites WHERE url LIKE 'http://example%';
    ```
    
 9. **查询条件中包含负向查询**
-   
+  
    **情况**: 例如 `NOT IN`, `NOT LIKE` 等负向查询条件会导致索引失效。
    
    **示例**:
@@ -1112,7 +1114,7 @@ SELECT * FROM websites WHERE url LIKE 'http://example%';
    ```
    
 10. **数据分布不均匀**
-    
+  
     **情况**: 即使有索引，如果数据分布非常不均匀，MySQL 优化器可能会选择全表扫描而不是使用索引。
 
 ## 23. 唯一索引比普通索引快吗?
