@@ -1190,11 +1190,7 @@ public class CacheUtil<K, V> {
 
 直接看：https://www.yuque.com/jingdianjichi/kwag7a/dkdh73io7gxcbgxe
 
-首先请看 `补充` 中关于 `MaBatisPlus拦截器实现公共字段的插入或修改`，在这里我们把有关操作的用户信息，也就是一些公共字段，通过拦截器的方式，不侵入源代码结构的情况下，将这些字段插入或者修改
-
-而这些字段正是排行榜和点赞收藏等的主要依据
-
-*对于排行榜一般来说实时的，非实时的。*
+首先请看 `补充` 中关于 `MaBatisPlus拦截器实现公共字段的插入或修改`，在这里我们把有关操作的用户信息，也就是一些公共字段，通过拦截器的方式，不侵入源代码结构的情况下，将这些字段插入或者修改，而这些字段正是排行榜和点赞收藏等的主要依据。*对于排行榜一般来说有实时的和非实时的。*
 
 ### 实时的方案
 
@@ -1214,15 +1210,13 @@ select count(1),create_by from subject_info group by create_by limit 0,5;
 
 有序集合，不允许重复的成员，然后每一个 key 都会包含一个 score 分数的概念。redis 根据分数可以帮助我们做从小到大，和从大到小的一个处理。有序集合的 key 不可重复，score 可重复。
 
-它是通过哈希表来实现的，添加，删除，查找，复杂度 o(1) ，最大数量是 2 的32 次方-1.
+它是通过**哈希表**来实现的，添加，删除，查找，复杂度 o(1) ，最大数量是 2 的32 次方-1.
 
 `zadd zrange zincrby zscore` 
 
 这种做法的好处在于，完全不用和数据库做任何的交互，纯纯的通过缓存来做，速度非常快，但是要避免一些大 key 的问题。
 
-下面给出我们代码中的实现逻辑，首先是在每次插入题目的时候，将zset的对应用户的贡献+1
-
-然后再从redis中查到数据
+下面给出我们代码中的实现逻辑，首先是在每次插入题目的时候，将zset的对应用户的贡献+1；然后再从redis中查到数据
 
 ```java
 @Override
@@ -1306,8 +1300,6 @@ public List<SubjectInfoBO> getContributeList() {
     return boList;
 }
 ```
-
-
 
 ### 非实时方案
 
@@ -1439,11 +1431,9 @@ public void add(SubjectLikedBO subjectLikedBO) {
 
 ## 1. “采取适配器模式实现oss对接”是怎么做的
 
-首先这个做法的场景是希望切换不同的OSS服务时不需要改动任何业务代码, 而只在 Nacos 中指定想要的 OSS 服务的 type, 依据Nacos
-结合 `@RefreshScope注解` 动态的刷新配置, 即读取指定的 type 然后修改为相应的适配器, 具体做法如下:
+首先这个做法的场景是希望切换不同的OSS服务时不需要改动任何业务代码, 而只在 Nacos 中指定想要的 OSS 服务的 type, 依据Nacos结合 `@RefreshScope注解` 动态的刷新配置, 即读取指定的 type 然后修改为相应的适配器, 具体做法如下:
 
-首先对不同的 OSS 服务的主要功能 抽取出一个公共的接口即 `Adapter`, 这里以 `MinIO` 为例。写一个配置类 `MinIOConfig` 先来读取
-`yml` 中关于 `MinIO` 必要的配置信息, 比如 `url`, `accessKey`, `secretKey`, 接着根据 `MinIO` 提供的 `MinIOClient`进一步封装其中的操作为一个工具类 `MinIOUtil`, 接着就可以专门为 `MinIO` 实现上述的适配器，只需要注入刚刚封装好的工具类即可实现.这时一个可用的适配器就做好了
+首先对不同的 OSS 服务的主要功能抽取出一个公共的接口即 `Adapter`, 这里以 `MinIO` 为例。写一个配置类 `MinIOConfig` 先来读取`yml` 中关于 `MinIO` 必要的配置信息, 比如 `url`, `accessKey`, `secretKey`, 接着根据 `MinIO` 提供的 `MinIOClient`进一步封装其中的操作为一个工具类 `MinIOUtil`, 接着就可以专门为 `MinIO` 实现上述的适配器，只需要注入刚刚封装好的工具类即可实现.这时一个可用的适配器就做好了
 
 接着, 为了在 `Controller` 中透明的提供 `OSS` 的服务, 于是对适配器做一个包装, 创建一个配置类专门动态的读取和刷新 `OSS`服务的 `type`, 根据不同的类型返回一个相应的适配器对象, 但统一都名为 `storageAdapter`, 即最上面提到的适配器类型。最后，创建一个 `FileService`, 用 `构造器注入Bean` 的方法注入这个适配器的实现对象, 就可以实现 根据类型注入对应的适配器对象，这样就可以用了
 
@@ -1609,8 +1599,6 @@ public class ThreadPoolUtils {
     }
 }
 ```
-
-
 
 ## 6. MabtisPlus拦截器实现公共字段的插入或修改
 
