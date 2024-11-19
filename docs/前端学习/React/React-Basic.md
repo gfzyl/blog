@@ -16,7 +16,7 @@
 
 ### JSX 的语法规则
 
-```JSX
+```jsx
 const VDOM = (
     <h2 id="atguigu">
         <span>hello react</span>
@@ -1289,7 +1289,7 @@ return(
     // 解构表达式，params是useSearchParams这个函数返回的一个东西，必须用params
     // 这个params是一个对象，里面有get方法，类似于getElementById的用法
     const [params] = useSearchParams()
-
+   
     const id = params.get('id')
     const name = params.get('name')
     ```
@@ -1443,7 +1443,7 @@ hash 模式只需要把创建路由的 api 替换成`createHashRouter`即可，�
 
     ```JSX
      const path = require('path');
-
+   
      module.exports = {
          // webpack 配置
          webpack: {
