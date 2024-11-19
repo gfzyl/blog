@@ -16,7 +16,7 @@
 
 ### JSX 的语法规则
 
-```jsx
+```
 // const VDOM = (
 //     <h2 id="atguigu">
 //         <span>hello react</span>
