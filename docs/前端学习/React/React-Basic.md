@@ -22,12 +22,6 @@
 //         <span>hello react</span>
 //     </h2>
 // );
-```jsx
-const VDOM = (
-    <h2 id="atguigu">
-        <span>hello react</span>
-    </h2>
-);
 ```
 
 1. 定义虚拟 Dom 时不要写引号`“”`
