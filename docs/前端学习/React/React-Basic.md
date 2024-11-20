@@ -16,14 +16,6 @@
 
 ### JSX 的语法规则
 
-```
-// const VDOM = (
-//     <h2 id="atguigu">
-//         <span>hello react</span>
-//     </h2>
-// );
-```
-
 1. 定义虚拟 Dom 时不要写引号`“”`
 2. 标签中混入 JS 表达式的时候要用`{}`（这就是为什么有的地方要用大括号）
 3. 样式的类名指定不要用`class`而是用`className`
